@@ -1,13 +1,15 @@
 import React from 'react';
-import { Search, Mail, Bell, HelpCircle, ChevronDown } from 'lucide-react';
+import { Search, Mail, Bell, HelpCircle, ChevronDown, Pin, PinOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import Logo from '@/components/Logo';
 
 interface TopBarProps {
   onMenuToggle: () => void;
+  onTogglePin?: () => void;
+  isPinned?: boolean;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ onMenuToggle }) => {
+const TopBar: React.FC<TopBarProps> = ({ onMenuToggle, onTogglePin, isPinned = false }) => {
   const { user, logout } = useAuth();
 
   const currentDate = new Date().toLocaleDateString('es-ES', {
@@ -22,7 +24,11 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuToggle }) => {
   });
 
   return (
-    <div className="bg-gray-50 shadow-sm border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+    <div className={`px-6 py-4 flex items-center justify-between transition-all duration-300 min-h-[4rem] ${
+      isPinned 
+        ? 'bg-white/95 backdrop-blur-md shadow-xl border-b border-gray-300 fixed-header-glass' 
+        : 'bg-gray-50 shadow-sm border-b border-gray-200'
+    }`}>
       {/* Left section */}
       <div className="flex items-center gap-4">
         <button
@@ -65,6 +71,22 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuToggle }) => {
 
       {/* Right section */}
       <div className="flex items-center gap-3">
+        {/* Pin button */}
+        {onTogglePin && (
+          <button 
+            onClick={onTogglePin}
+            className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 ${
+              isPinned 
+                ? 'bg-primary-100 text-primary-600 hover:bg-primary-200 shadow-md' 
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+            style={isPinned ? { animation: 'pin-pulse 2s infinite' } : {}}
+            title={isPinned ? 'Desfijar header' : 'Fijar header'}
+          >
+            {isPinned ? <PinOff className="w-5 h-5" /> : <Pin className="w-5 h-5" />}
+          </button>
+        )}
+        
         {/* Action buttons */}
         <div className="hidden sm:flex items-center gap-2">
           <button className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-colors">

@@ -57,6 +57,34 @@
   .nav-item.active {
     @apply bg-gradient-to-r from-primary-100 to-secondary-100 text-primary-600 border border-primary-200 shadow-md;
   }
+
+  /* Header pin styles */
+  .header-pinned {
+    @apply sticky top-0 z-50 shadow-xl;
+    backdrop-filter: blur(10px);
+    background: rgba(249, 250, 251, 0.95);
+    border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+  }
+  
+  .fixed-header-glass {
+    backdrop-filter: blur(12px) saturate(180%);
+    background: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
+  
+  .header-pin-button {
+    @apply transition-all duration-300 transform;
+  }
+  
+  .header-pin-button:hover {
+    @apply scale-110;
+  }
+  
+  .header-pin-button.active {
+    @apply bg-primary-100 text-primary-600 shadow-md;
+    animation: pin-pulse 2s infinite;
+  }
 }
 
 @layer utilities {
@@ -66,5 +94,78 @@
   
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+/* Animaciones personalizadas para IA */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+@keyframes ai-scan {
+  0% {
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(147, 51, 234, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
+  }
+}
+
+@keyframes ai-progress {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+.ai-analyzing {
+  animation: ai-scan 2s infinite;
+}
+
+.ai-sparkle {
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+.ai-progress-bg {
+  background: linear-gradient(-45deg, #ee7724, #d8363a, #dd3675, #b44593);
+  background-size: 400% 400%;
+  animation: ai-progress 2s ease infinite;
+}
+
+/* Pin animation for header */
+@keyframes pin-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+  }
+  50% { 
+    transform: scale(1.05);
+    box-shadow: 0 0 0 8px rgba(102, 126, 234, 0);
   }
 }

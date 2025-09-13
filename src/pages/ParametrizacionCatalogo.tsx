@@ -52,6 +52,17 @@ const ParametrizacionCatalogo: React.FC = () => {
   const [searchSiaff, setSearchSiaff] = useState('');
   const [searchCliente, setSearchCliente] = useState('');
   
+  // Estados para animaciones de IA
+  const [aiAnalyzingNode, setAiAnalyzingNode] = useState<string | null>(null);
+  const [aiProgress, setAiProgress] = useState(0);
+  const [aiStep, setAiStep] = useState('');
+  const [newConnectionsPreview, setNewConnectionsPreview] = useState<Conexion[]>([]);
+  
+  // Estados para panning en modo visual
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  
   const canvasRef = useRef<HTMLDivElement>(null);
 
   // Datos del catálogo del cliente (simulado)
@@ -240,49 +251,114 @@ const ParametrizacionCatalogo: React.FC = () => {
     { icon: Settings, label: 'Parametrización Catálogo' }
   ];
 
-  // Función de IA para mapeo automático
+  // Función de IA para mapeo automático con animaciones espectaculares
   const parametrizarConIA = async () => {
-    setIsAIProcessing(true);
+    // Verificar si hay cuentas disponibles para parametrizar
+    const cuentasAAnalizar = cuentasCliente.filter(c => !conexiones.some(conn => conn.clienteId === c.id));
     
-    // Simular procesamiento de IA
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    if (cuentasAAnalizar.length === 0) {
+      alert('¡Todas las cuentas ya están parametrizadas! 🎉');
+      return;
+    }
+    
+    setIsAIProcessing(true);
+    setAiProgress(0);
+    setNewConnectionsPreview([]);
+    setAiAnalyzingNode(null);
+    setAiStep('');
+    
+    const pasos = [
+      'Iniciando análisis inteligente...',
+      `Escaneando ${cuentasAAnalizar.length} cuentas pendientes...`,
+      'Analizando patrones en SIAFF...',
+      'Calculando similitudes semánticas...',
+      'Aplicando algoritmos de machine learning...',
+      'Verificando coincidencias óptimas...',
+      'Generando conexiones automáticas...',
+      'Finalizando parametrización...'
+    ];
     
     const nuevasConexiones: Conexion[] = [];
     
-    // Lógica inteligente de mapeo basada en similitud de nombres y códigos
-    cuentasCliente.forEach(cuentaCliente => {
-      if (conexiones.some(c => c.clienteId === cuentaCliente.id)) return; // Ya mapeada
-      
-      // Buscar coincidencia por código exacto
-      let cuentaSiaff = cuentasSiaff.find(s => 
-        s.codigo === cuentaCliente.codigo && 
-        s.tipo === cuentaCliente.tipo &&
-        !conexiones.some(c => c.siaffId === s.id) &&
-        !nuevasConexiones.some(c => c.siaffId === s.id)
-      );
-      
-      // Si no hay coincidencia exacta, buscar por similitud de nombre
-      if (!cuentaSiaff) {
-        cuentaSiaff = cuentasSiaff.find(s => {
-          const similarity = calcularSimilitud(cuentaCliente.nombre, s.nombre);
-          return similarity > 0.6 && 
-                 s.tipo === cuentaCliente.tipo &&
-                 !conexiones.some(c => c.siaffId === s.id) &&
-                 !nuevasConexiones.some(c => c.siaffId === s.id);
-        });
+    try {
+      for (let i = 0; i < pasos.length; i++) {
+        setAiStep(pasos[i]);
+        setAiProgress((i + 1) / pasos.length * 100);
+        
+        // Análisis de nodos durante los pasos de procesamiento
+        if (i >= 1 && i <= 5 && cuentasAAnalizar.length > 0) {
+          const stepProgress = (i - 1) / 5; // Entre 0 y 1
+          const totalNodes = cuentasAAnalizar.length;
+          const currentNodeIndex = Math.floor(stepProgress * totalNodes);
+          
+          if (currentNodeIndex < totalNodes) {
+            const nodoActual = cuentasAAnalizar[currentNodeIndex];
+            setAiAnalyzingNode(nodoActual.id);
+            
+            // Buscar coincidencia para este nodo - SOLO si no está ya conectado
+            const yaConectado = conexiones.some(c => c.clienteId === nodoActual.id) || 
+                              nuevasConexiones.some(c => c.clienteId === nodoActual.id);
+            
+            if (!yaConectado) {
+              // Buscar por código exacto primero
+              let cuentaSiaff = cuentasSiaff.find(s => 
+                s.codigo === nodoActual.codigo && 
+                s.tipo === nodoActual.tipo &&
+                !conexiones.some(c => c.siaffId === s.id) &&
+                !nuevasConexiones.some(c => c.siaffId === s.id)
+              );
+              
+              // Si no hay coincidencia exacta, buscar por similitud de nombre
+              if (!cuentaSiaff) {
+                cuentaSiaff = cuentasSiaff.find(s => {
+                  const similarity = calcularSimilitud(nodoActual.nombre, s.nombre);
+                  return similarity > 0.6 && 
+                         s.tipo === nodoActual.tipo &&
+                         !conexiones.some(c => c.siaffId === s.id) &&
+                         !nuevasConexiones.some(c => c.siaffId === s.id);
+                });
+              }
+              
+              if (cuentaSiaff) {
+                const nuevaConexion = {
+                  id: `ai-${Date.now()}-${nodoActual.id}-${cuentaSiaff.id}`,
+                  clienteId: nodoActual.id,
+                  siaffId: cuentaSiaff.id
+                };
+                nuevasConexiones.push(nuevaConexion);
+                setNewConnectionsPreview([...nuevasConexiones]);
+              }
+            }
+          }
+        }
+        
+        // Duración variable por paso
+        const duracion = i === 0 ? 800 : i === pasos.length - 1 ? 1200 : 600;
+        await new Promise(resolve => setTimeout(resolve, duracion));
       }
       
-      if (cuentaSiaff) {
-        nuevasConexiones.push({
-          id: `ai-${cuentaCliente.id}-${cuentaSiaff.id}`,
-          clienteId: cuentaCliente.id,
-          siaffId: cuentaSiaff.id
-        });
+      // Aplicar todas las conexiones al final
+      if (nuevasConexiones.length > 0) {
+        setConexiones(prev => [...prev, ...nuevasConexiones]);
+        setAiStep(`¡Éxito! ${nuevasConexiones.length} nuevas conexiones creadas.`);
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      } else {
+        setAiStep('No se encontraron nuevas coincidencias automáticas.');
+        await new Promise(resolve => setTimeout(resolve, 1500));
       }
-    });
-    
-    setConexiones(prev => [...prev, ...nuevasConexiones]);
-    setIsAIProcessing(false);
+      
+    } catch (error) {
+      console.error('Error en parametrización:', error);
+      setAiStep('Error durante el procesamiento.');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } finally {
+      // Limpiar TODOS los estados de animación
+      setAiAnalyzingNode(null);
+      setNewConnectionsPreview([]);
+      setAiStep('');
+      setAiProgress(0);
+      setIsAIProcessing(false);
+    }
   };
 
   // Función para calcular similitud entre textos
@@ -315,13 +391,33 @@ const ParametrizacionCatalogo: React.FC = () => {
       <button 
         onClick={parametrizarConIA}
         disabled={isAIProcessing}
-        className="btn-secondary bg-gradient-to-r from-purple-500 to-pink-500 text-white border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
+        className="btn-secondary bg-gradient-to-r from-purple-500 to-pink-500 text-white border-none hover:from-purple-600 hover:to-pink-600 disabled:opacity-90 relative overflow-hidden"
       >
         {isAIProcessing ? (
-          <>
-            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-            Procesando...
-          </>
+          <div className="flex items-center gap-2">
+            {/* Barra de progreso de fondo */}
+            <div 
+              className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 opacity-30 transition-all duration-300"
+              style={{ width: `${aiProgress}%` }}
+            />
+            
+            {/* Iconos animados */}
+            <div className="relative flex items-center gap-2">
+              <div className="flex items-center">
+                <Brain className="w-4 h-4 animate-pulse" />
+                <div className="ml-1 flex space-x-1">
+                  <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
+              </div>
+              
+              <div className="flex flex-col items-start">
+                <span className="text-xs font-medium">{Math.round(aiProgress)}%</span>
+                <span className="text-xs opacity-90">{aiStep}</span>
+              </div>
+            </div>
+          </div>
         ) : (
           <>
             <Sparkles className="w-4 h-4" />
@@ -340,12 +436,18 @@ const ParametrizacionCatalogo: React.FC = () => {
     if (modoVista !== 'visual') return;
     
     const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
+    const nodeRect = (e.target as HTMLElement).getBoundingClientRect();
+    if (!rect || !nodeRect) return;
     
     setDragging(cuentaId);
+    
+    // Calcular el offset desde el centro del nodo
+    const nodeCenterX = nodeRect.left + nodeRect.width / 2;
+    const nodeCenterY = nodeRect.top + nodeRect.height / 2;
+    
     setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      x: e.clientX - nodeCenterX,
+      y: e.clientY - nodeCenterY
     });
   }, [modoVista]);
 
@@ -353,18 +455,50 @@ const ParametrizacionCatalogo: React.FC = () => {
     if (!dragging || !canvasRef.current) return;
     
     const rect = canvasRef.current.getBoundingClientRect();
-    const newX = (e.clientX - rect.left - dragOffset.x) / zoom;
-    const newY = (e.clientY - rect.top - dragOffset.y) / zoom;
+    
+    // Calcular la nueva posición considerando el zoom, panning y el offset del centro del nodo
+    const canvasX = (e.clientX - rect.left - panOffset.x) / zoom;
+    const canvasY = (e.clientY - rect.top - panOffset.y) / zoom;
+    
+    // Ajustar por el tamaño del nodo para centrarlo en el mouse
+    const newX = canvasX - (192 / 2); // 192px es el ancho aprox del nodo, centrarlo
+    const newY = canvasY - (40 / 2);  // 40px es la altura aprox del nodo, centrarlo
     
     setCuentasCliente(prev => prev.map(cuenta => 
       cuenta.id === dragging 
         ? { ...cuenta, x: newX, y: newY }
         : cuenta
     ));
-  }, [dragging, dragOffset, zoom]);
+  }, [dragging, zoom, panOffset]);
 
   const handleDragEnd = useCallback(() => {
     setDragging(null);
+  }, []);
+
+  // Funciones para manejo del panning del canvas
+  const handleCanvasMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.button !== 0) return; // Solo botón izquierdo
+    if (dragging) return; // No hacer panning si estamos arrastrando un nodo
+    
+    setIsPanning(true);
+    setPanStart({
+      x: e.clientX - panOffset.x,
+      y: e.clientY - panOffset.y
+    });
+  }, [panOffset, dragging]);
+
+  const handleCanvasMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isPanning) return;
+    
+    e.preventDefault();
+    setPanOffset({
+      x: e.clientX - panStart.x,
+      y: e.clientY - panStart.y
+    });
+  }, [isPanning, panStart]);
+
+  const handleCanvasMouseUp = useCallback(() => {
+    setIsPanning(false);
   }, []);
 
   const crearConexion = () => {
@@ -654,6 +788,10 @@ const ParametrizacionCatalogo: React.FC = () => {
           </div>
         </div>
         
+        <div className="text-xs text-gray-600 mb-3">
+          • Arrastra el canvas para navegar • Arrastra nodos para mover • Click para seleccionar • Panel SIAFF fijo en esquina
+        </div>
+        
         {/* Buscadores para modo visual */}
         <div className="grid grid-cols-2 gap-4">
           <div className="relative">
@@ -679,105 +817,111 @@ const ParametrizacionCatalogo: React.FC = () => {
         </div>
       </div>
       
-      <div className="relative h-full overflow-auto bg-gray-50">
+      <div className="relative h-full overflow-hidden bg-gray-50">
+        {/* Patrón de fondo de grid */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              radial-gradient(circle, #9ca3af 1.5px, transparent 1.5px)
+            `,
+            backgroundSize: '20px 20px',
+            backgroundPosition: `${panOffset.x % 20}px ${panOffset.y % 20}px`
+          }}
+        />
+        
         <div 
           ref={canvasRef}
-          className="relative bg-gray-50 min-h-full"
+          className="relative bg-transparent min-h-full select-none"
           style={{ 
-            width: `${100 / zoom}%`,
-            height: `${100 / zoom}%`,
-            minWidth: '100%',
-            minHeight: '100%'
+            cursor: isPanning ? 'grabbing' : (dragging ? 'grabbing' : 'grab'),
+            width: '100%',
+            height: '100%'
           }}
-          onMouseMove={handleDragMove}
-          onMouseUp={handleDragEnd}
-          onMouseLeave={handleDragEnd}
+          onMouseDown={handleCanvasMouseDown}
+          onMouseMove={(e) => {
+            if (isPanning) {
+              handleCanvasMouseMove(e);
+            } else if (dragging) {
+              handleDragMove(e);
+            }
+          }}
+          onMouseUp={() => {
+            if (isPanning) {
+              handleCanvasMouseUp();
+            } else if (dragging) {
+              handleDragEnd();
+            }
+          }}
+          onMouseLeave={() => {
+            if (isPanning) {
+              handleCanvasMouseUp();
+            } else if (dragging) {
+              handleDragEnd();
+            }
+          }}
         >
           <div
             style={{ 
-              transform: `scale(${zoom})`, 
+              transform: `scale(${zoom}) translate(${panOffset.x}px, ${panOffset.y}px)`, 
               transformOrigin: '0 0',
-              width: `${100 / zoom}%`,
-              height: `${100 / zoom}%`,
-              minWidth: '800px',
-              minHeight: '600px'
+              width: '2000px',
+              height: '2000px'
             }}
           >
             {/* Nodos del Cliente */}
-            {cuentasClienteFiltradas.map(cuenta => (
-              <div
-                key={cuenta.id}
-                className={`absolute bg-blue-100 border-2 border-blue-300 rounded-lg p-3 cursor-move shadow-lg min-w-48 ${
-                  selectedCliente === cuenta.id ? 'ring-2 ring-blue-500' : ''
-                }`}
-                style={{ 
-                  left: `${cuenta.x}px`, 
-                  top: `${cuenta.y}px`,
-                  transform: dragging === cuenta.id ? 'scale(1.05)' : 'scale(1)'
-                }}
-                onMouseDown={(e) => {
-                  handleDragStart(e, cuenta.id);
-                  setSelectedCliente(cuenta.id);
-                }}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className={`w-3 h-3 rounded-full ${getTipoColor(cuenta.tipo)}`}></div>
-                  <div className="text-xs font-mono font-bold">{cuenta.codigo}</div>
-                </div>
-                <div className="text-sm font-medium text-gray-900">{cuenta.nombre}</div>
-                <div className="text-xs text-gray-600">{cuenta.tipo}</div>
-              </div>
-            ))}
-
-            {/* Panel SIAFF fijo */}
-            <div className="absolute right-4 top-4 w-64 bg-white border border-gray-300 rounded-lg shadow-lg">
-              <div className="bg-gray-100 p-3 border-b">
-                <h4 className="font-semibold text-sm">Catálogo SIAFF</h4>
-              </div>
-              <div className="p-3 max-h-96 overflow-y-auto">
-                {cuentasSiaffFiltradas.map(cuenta => {
-                  const usado = conexiones.some(c => c.siaffId === cuenta.id);
-                  return (
-                    <div
-                      key={cuenta.id}
-                      onClick={() => setSelectedSiaff(cuenta.id)}
-                      className={`p-2 mb-1 rounded text-xs cursor-pointer transition-all ${
-                        selectedSiaff === cuenta.id 
-                          ? 'bg-gray-200 border border-gray-400' 
-                          : usado
-                          ? 'bg-green-100 border border-green-300'
-                          : 'hover:bg-gray-100'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="font-mono font-semibold">{cuenta.codigo}</div>
-                          <div className="text-gray-700 truncate">{cuenta.nombre}</div>
-                        </div>
-                        {usado && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const conexion = conexiones.find(c => c.siaffId === cuenta.id);
-                              if (conexion) {
-                                eliminarConexion(conexion.id);
-                              }
-                            }}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors ml-2"
-                            title="Desvincular cuenta"
-                          >
-                            <Unlink className="w-3 h-3" />
-                          </button>
-                        )}
-                      </div>
+            {cuentasClienteFiltradas.map(cuenta => {
+              const isBeingAnalyzed = aiAnalyzingNode === cuenta.id;
+              const hasPreviewConnection = newConnectionsPreview.some(c => c.clienteId === cuenta.id);
+              
+              return (
+                <div
+                  key={cuenta.id}
+                  className={`absolute rounded-lg p-3 cursor-move shadow-lg min-w-48 transition-all duration-300 ${
+                    selectedCliente === cuenta.id ? 'ring-2 ring-blue-500' : ''
+                  } ${
+                    isBeingAnalyzed 
+                      ? 'bg-gradient-to-r from-purple-200 to-pink-200 border-2 border-purple-400 ring-4 ring-purple-300 ring-opacity-50 animate-pulse' 
+                      : hasPreviewConnection
+                        ? 'bg-gradient-to-r from-green-200 to-emerald-200 border-2 border-green-400 ring-2 ring-green-300'
+                        : 'bg-blue-100 border-2 border-blue-300'
+                  }`}
+                  style={{ 
+                    left: `${cuenta.x}px`, 
+                    top: `${cuenta.y}px`,
+                    transform: dragging === cuenta.id ? 'scale(1.05)' : isBeingAnalyzed ? 'scale(1.1)' : 'scale(1)'
+                  }}
+                  onMouseDown={(e) => {
+                    e.stopPropagation(); // Evitar que active el panning
+                    handleDragStart(e, cuenta.id);
+                    setSelectedCliente(cuenta.id);
+                  }}
+                >
+                  {/* Efecto de análisis de IA */}
+                  {isBeingAnalyzed && (
+                    <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-lg opacity-20 animate-ping"></div>
+                  )}
+                  
+                  {/* Indicador de conexión nueva */}
+                  {hasPreviewConnection && !isBeingAnalyzed && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-3 h-3 text-white" />
                     </div>
-                  );
-                })}
-              </div>
-            </div>
+                  )}
+                  
+                  <div className="flex items-center justify-between mb-2">
+                    <div className={`w-3 h-3 rounded-full ${getTipoColor(cuenta.tipo)}`}></div>
+                    <div className="text-xs font-mono font-bold">{cuenta.codigo}</div>
+                  </div>
+                  <div className="text-sm font-medium text-gray-900">{cuenta.nombre}</div>
+                  <div className="text-xs text-gray-600">{cuenta.tipo}</div>
+                </div>
+              );
+            })}
 
             {/* Conexiones visuales */}
             <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+              {/* Conexiones establecidas */}
               {conexiones.map(conexion => {
                 const cuentaCliente = cuentasCliente.find(c => c.id === conexion.clienteId);
                 if (!cuentaCliente) return null;
@@ -795,7 +939,95 @@ const ParametrizacionCatalogo: React.FC = () => {
                   />
                 );
               })}
+              
+              {/* Conexiones de preview de IA (animadas) */}
+              {newConnectionsPreview.map(conexion => {
+                const cuentaCliente = cuentasCliente.find(c => c.id === conexion.clienteId);
+                if (!cuentaCliente) return null;
+                
+                return (
+                  <g key={`preview-${conexion.id}`}>
+                    {/* Línea de preview pulsante */}
+                    <line
+                      x1={cuentaCliente.x! + 192}
+                      y1={cuentaCliente.y! + 30}
+                      x2={window.innerWidth - 300}
+                      y2={100}
+                      stroke="#f59e0b"
+                      strokeWidth="3"
+                      strokeDasharray="8,4"
+                      opacity="0.8"
+                      className="animate-pulse"
+                    />
+                    {/* Efecto de flujo */}
+                    <line
+                      x1={cuentaCliente.x! + 192}
+                      y1={cuentaCliente.y! + 30}
+                      x2={window.innerWidth - 300}
+                      y2={100}
+                      stroke="#fbbf24"
+                      strokeWidth="1"
+                      strokeDasharray="20,10"
+                      opacity="0.6"
+                    >
+                      <animate
+                        attributeName="stroke-dashoffset"
+                        values="0;30"
+                        dur="1s"
+                        repeatCount="indefinite"
+                      />
+                    </line>
+                  </g>
+                );
+              })}
             </svg>
+          </div>
+
+          {/* Panel SIAFF fijo - fuera del contenedor transformado */}
+          <div className="absolute right-4 top-4 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+            <div className="bg-gray-100 p-3 border-b">
+              <h4 className="font-semibold text-sm">Catálogo SIAFF</h4>
+            </div>
+            <div className="p-3 max-h-96 overflow-y-auto">
+              {cuentasSiaffFiltradas.map(cuenta => {
+                const usado = conexiones.some(c => c.siaffId === cuenta.id);
+                return (
+                  <div
+                    key={cuenta.id}
+                    onClick={() => setSelectedSiaff(cuenta.id)}
+                    className={`p-2 mb-1 rounded text-xs cursor-pointer transition-all ${
+                      selectedSiaff === cuenta.id 
+                        ? 'bg-gray-200 border border-gray-400' 
+                        : usado
+                        ? 'bg-green-100 border border-green-300'
+                        : 'hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="font-mono font-semibold">{cuenta.codigo}</div>
+                        <div className="text-gray-700 truncate">{cuenta.nombre}</div>
+                      </div>
+                      {usado && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const conexion = conexiones.find(c => c.siaffId === cuenta.id);
+                            if (conexion) {
+                              eliminarConexion(conexion.id);
+                            }
+                          }}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition-colors ml-2"
+                          title="Desvincular cuenta"
+                        >
+                          <Unlink className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
@@ -961,6 +1193,61 @@ const ParametrizacionCatalogo: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* Overlay de IA procesando */}
+      {isAIProcessing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
+            <div className="relative mb-6">
+              {/* Círculo principal con animación */}
+              <div className="w-20 h-20 mx-auto relative">
+                <div className="absolute inset-0 border-4 border-purple-200 rounded-full"></div>
+                <div 
+                  className="absolute inset-0 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"
+                  style={{ animationDuration: '1s' }}
+                ></div>
+                <div 
+                  className="absolute inset-2 border-2 border-pink-300 rounded-full border-b-transparent animate-spin"
+                  style={{ animationDuration: '1.5s', animationDirection: 'reverse' }}
+                ></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Brain className="w-8 h-8 text-purple-600 animate-pulse" />
+                </div>
+              </div>
+              
+              {/* Partículas flotantes */}
+              <div className="absolute -inset-4">
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-2 h-2 bg-purple-400 rounded-full opacity-60"
+                    style={{
+                      left: `${50 + 40 * Math.cos((i * Math.PI * 2) / 8)}%`,
+                      top: `${50 + 40 * Math.sin((i * Math.PI * 2) / 8)}%`,
+                      animation: `float ${1 + i * 0.1}s ease-in-out infinite alternate`,
+                      animationDelay: `${i * 0.1}s`
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              IA Analizando Cuentas
+            </h3>
+            <p className="text-gray-600 mb-4">{aiStep}</p>
+            
+            {/* Barra de progreso */}
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+              <div 
+                className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${aiProgress}%` }}
+              ></div>
+            </div>
+            <p className="text-sm text-gray-500">{Math.round(aiProgress)}% completado</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
