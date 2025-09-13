@@ -1,0 +1,70 @@
+/* Import auth animations */
+@import './styles/auth-animations.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans;
+    margin: 0;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .glass-effect {
+    @apply bg-black/95 backdrop-blur-xl border border-white/10;
+  }
+  
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary-500 to-secondary-500;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-br from-primary-500 to-secondary-500 bg-clip-text text-transparent;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-br from-primary-500 to-secondary-500 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:shadow-glow hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold border border-gray-200 transition-all duration-300 hover:bg-gray-200 hover:shadow-md;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-lg border border-gray-100 p-6;
+  }
+  
+  .nav-item {
+    @apply flex items-center px-4 py-3 mx-2 rounded-xl cursor-pointer transition-all duration-300 font-medium;
+  }
+  
+  .nav-item:hover {
+    @apply bg-primary-50 text-primary-600 transform translate-x-2;
+  }
+  
+  .nav-item.active {
+    @apply bg-gradient-to-r from-primary-100 to-secondary-100 text-primary-600 border border-primary-200 shadow-md;
+  }
+}
+
+@layer utilities {
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .text-balance {
+    text-wrap: balance;
+  }
+}

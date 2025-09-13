@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Finanzas Corporativas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            color: #333;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            pointer-events: none;
+        }
+
+        .company-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .company-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .company-contact {
+            font-size: 12px;
+            color: #888;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .nav-section {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-item::before {
+            content: '●';
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background: #f8fafc;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+
+        .header-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .balance-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .balance-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .section-total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+
+        .balance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .balance-item:hover {
+            background: #f8fafc;
+            margin: 0 -15px;
+            padding: 12px 15px;
+            border-radius: 8px;
+        }
+
+        .balance-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-name {
+            font-size: 14px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .item-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .positive {
+            color: #10b981;
+        }
+
+        .negative {
+            color: #ef4444;
+        }
+
+        .subsection {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .subsection-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .total-row {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            margin: 20px -25px -25px -25px;
+            padding: 20px 25px;
+            border-radius: 0 0 15px 15px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .balance-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .indicator.green {
+            background: #10b981;
+        }
+
+        .indicator.red {
+            background: #ef4444;
+        }
+
+        .indicator.blue {
+            background: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="company-header">
+            <div class="company-logo">TC</div>
+            <div class="company-name">TreeCloud Technologies</div>
+            <div class="company-contact">CONTACTAR</div>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-item">Dashboard</div>
+            <div class="nav-item active">Finanzas Corporativas</div>
+            <div class="nav-item">Catálogo de Cuentas</div>
+            <div class="nav-item">Balance de Comprobación</div>
+            <div class="nav-item">Ventas</div>
+            <div class="nav-item">Compras</div>
+            <div class="nav-item">Cuentas por Pagar</div>
+            <div class="nav-item">Cuentas por Cobrar</div>
+            <div class="nav-item">Estado de Resultados</div>
+            <div class="nav-item">Balance General</div>
+            <div class="nav-item">Índices Financieros</div>
+            <div class="nav-item">Consolidado</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="header-left">
+                <div class="header-title">FINANZAS CORPORATIVAS</div>
+                <div class="header-subtitle">TreeCloud Technologies - El Salvador</div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary">Exportar</button>
+                <button class="btn btn-primary">Meses</button>
+            </div>
+        </div>
+
+        <div class="balance-container">
+            <div class="balance-section">
+                <div class="section-title">ACTIVOS CORRIENTES</div>
+                <div class="section-total">$24,549,694.62</div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Caja y bancos</span>
+                    <span class="item-value">$32,767,139.48</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Depósitos a plazo</span>
+                    <span class="item-value">$320,000.00</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name"><span class="indicator green"></span>Cuentas por cobrar</span>
+                    <span class="item-value">$439,847.97</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Clientes</span>
+                    <span class="item-value">$300,206.99</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Documentos por cobrar</span>
+                    <span class="item-value">$139,790.38</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Cuentas por cobrar partes relacionadas</span>
+                    <span class="item-value">$159,000.00</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Deudores varios</span>
+                    <span class="item-value">$192,358.00</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Inventarios</span>
+                    <span class="item-value">$163,788.50</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Mercaderías en camino</span>
+                    <span class="item-value">$163,788.50</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Crédito fiscal IVA</span>
+                    <span class="item-value">$56,738.17</span>
+                </div>
+
+                <div class="subsection">
+                    <div class="subsection-title">ACTIVOS NO CORRIENTES</div>
+                    <div class="section-total">$5,824,734.67</div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name"><span class="indicator green"></span>Bienes muebles netos</span>
+                        <span class="item-value">$89,824.97</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Bienes muebles</span>
+                        <span class="item-value">$531,639.32</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Menos depreciación</span>
+                        <span class="item-value negative">-$442,814.35</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name"><span class="indicator green"></span>Bienes inmuebles netos</span>
+                        <span class="item-value">$1,733,909.70</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Bienes inmuebles</span>
+                        <span class="item-value">$9,038,303.96</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Menos depreciación</span>
+                        <span class="item-value negative">-$1,302,394.26</span>
+                    </div>
+                </div>
+
+                <div class="total-row">
+                    <div class="balance-item">
+                        <span class="item-name">TOTAL ACTIVOS</span>
+                        <span class="item-value">$5,824,734.67</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="balance-section">
+                <div class="section-title">PASIVOS CORRIENTES</div>
+                <div class="section-total">$1,588,623.27</div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Préstamos Bancarios</span>
+                    <span class="item-value">$983,283.12</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Proveedores</span>
+                    <span class="item-value">$532,311.25</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Cuentas por pagar parte relacionada</span>
+                    <span class="item-value">$60,032.30</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Impuestos por pagar</span>
+                    <span class="item-value">$8,996.10</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Retenciones</span>
+                    <span class="item-value">$22,624.89</span>
+                </div>
+                
+                <div class="balance-item">
+                    <span class="item-name">Débito fiscal IVA</span>
+                    <span class="item-value">$42.59</span>
+                </div>
+
+                <div class="subsection">
+                    <div class="subsection-title">PASIVOS NO CORRIENTES</div>
+                    <div class="section-total">$3,002,010.36</div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Préstamos bancarios largo plazo</span>
+                        <span class="item-value">$3,002,010.36</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Proveedores locales</span>
+                        <span class="item-value">-</span>
+                    </div>
+                </div>
+
+                <div class="subsection">
+                    <div class="subsection-title">PATRIMONIO</div>
+                    <div class="section-total">$4,605,765.29</div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name"><span class="indicator green"></span>Capital social</span>
+                        <span class="item-value">$1,479,439.60</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Capital mínimo</span>
+                        <span class="item-value">$174,356.00</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Capital variable</span>
+                        <span class="item-value">$1,315,118.00</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Reserva legal</span>
+                        <span class="item-value">$295,898.40</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name"><span class="indicator green"></span>Utilidades</span>
+                        <span class="item-value">$2,830,376.89</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Utilidad del ejercicio</span>
+                        <span class="item-value">$761,273.38</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Utilidades acumuladas</span>
+                        <span class="item-value">$2,069,103.51</span>
+                    </div>
+                    
+                    <div class="balance-item">
+                        <span class="item-name">Pérdidas</span>
+                        <span class="item-value negative">$1,000.00</span>
+                    </div>
+                </div>
+
+                <div class="total-row">
+                    <div class="balance-item">
+                        <span class="item-name">TOTAL PASIVOS</span>
+                        <span class="item-value">$5,824,734.67</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
