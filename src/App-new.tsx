@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext-new';
 import { AppProvider } from '@/contexts/AppContext';
 import MainLayout from '@/components/MainLayout';
 import Auth from '@/pages/Auth';
@@ -9,8 +9,12 @@ import AdminDashboard from '@/pages/AdminDashboard';
 import CompanySelector from '@/pages/CompanySelector';
 
 // Protected Route Component
-const ProtectedRoute: React.FC<{ children: React.ReactNode; adminOnly?: boolean }> = ({ children, adminOnly = false }) => {
-  const { isAuthenticated, isLoading, user, needsCompanySelection, selectedCompany, currentRole } = useAuth();
+const ProtectedRoute: React.FC<{ children: React.ReactNode; requiresCompany?: boolean; adminOnly?: boolean }> = ({ 
+  children, 
+  requiresCompany = true,
+  adminOnly = false 
+}) => {
+  const { isAuthenticated, isLoading, user, needsCompanySelection, selectedCompany } = useAuth();
   
   if (isLoading) {
     return (
@@ -24,18 +28,17 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; adminOnly?: boolean 
     return <Navigate to="/login" replace />;
   }
 
-  // Si el usuario necesita seleccionar una empresa
-  if (needsCompanySelection || !selectedCompany) {
-    return <Navigate to="/company-selector" replace />;
+  // Si necesita selección de empresa y no tiene empresa seleccionada
+  if (requiresCompany && (needsCompanySelection || !selectedCompany)) {
+    return <Navigate to="/select-company" replace />;
   }
 
-  // Verificar permisos de admin basado en el nuevo sistema de roles
+  // Verificar permisos de admin (ahora basado en rol por empresa o rol global)
   if (adminOnly) {
-    const hasAdminAccess = user?.globalRole === 'super_admin' || 
-                          currentRole === 'owner' || 
-                          currentRole === 'admin';
+    const isSystemAdmin = user?.globalRole === 'super_admin';
+    const isCompanyAdmin = selectedCompany?.role === 'owner' || selectedCompany?.role === 'admin';
     
-    if (!hasAdminAccess) {
+    if (!isSystemAdmin && !isCompanyAdmin) {
       return <Navigate to="/dashboard/financial-dashboard" replace />;
     }
   }
@@ -56,18 +59,20 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
   
   if (isAuthenticated) {
+    // Si necesita selección de empresa, redirigir ahí
     if (needsCompanySelection || !selectedCompany) {
-      return <Navigate to="/company-selector" replace />;
+      return <Navigate to="/select-company" replace />;
     }
-    // Redirigir al dashboard si ya está autenticado y tiene empresa seleccionada
+    
+    // Si ya tiene empresa seleccionada, redirigir al dashboard
     return <Navigate to="/dashboard/financial-dashboard" replace />;
   }
   
   return <>{children}</>;
 };
 
-// Company Selection Route Component
-const CompanySelectorRoute: React.FC = () => {
+// Company Selection Route (only for authenticated users without company)
+const CompanySelectionRoute: React.FC = () => {
   const { isAuthenticated, isLoading, needsCompanySelection, selectedCompany } = useAuth();
   
   if (isLoading) {
@@ -81,7 +86,7 @@ const CompanySelectorRoute: React.FC = () => {
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  
+
   // Si ya tiene empresa seleccionada, redirigir al dashboard
   if (!needsCompanySelection && selectedCompany) {
     return <Navigate to="/dashboard/financial-dashboard" replace />;
@@ -92,7 +97,7 @@ const CompanySelectorRoute: React.FC = () => {
 
 // Smart Home Route Component
 const SmartHomeRoute: React.FC = () => {
-  const { isAuthenticated, user, isLoading, needsCompanySelection, selectedCompany, currentRole } = useAuth();
+  const { isAuthenticated, isLoading, needsCompanySelection, selectedCompany, user } = useAuth();
   
   if (isLoading) {
     return (
@@ -102,21 +107,24 @@ const SmartHomeRoute: React.FC = () => {
     );
   }
   
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  if (isAuthenticated) {
+    // Si necesita selección de empresa
+    if (needsCompanySelection || !selectedCompany) {
+      return <Navigate to="/select-company" replace />;
+    }
+    
+    // Redirigir según el tipo de usuario
+    const isSystemAdmin = user?.globalRole === 'super_admin';
+    const isCompanyAdmin = selectedCompany?.role === 'owner' || selectedCompany?.role === 'admin';
+    
+    if (isSystemAdmin || isCompanyAdmin) {
+      return <Navigate to="/admin/user-management" replace />;
+    } else {
+      return <Navigate to="/dashboard/financial-dashboard" replace />;
+    }
   }
   
-  if (needsCompanySelection || !selectedCompany) {
-    return <Navigate to="/company-selector" replace />;
-  }
-  
-  // Redirigir según el rol del usuario
-  const hasAdminAccess = user?.globalRole === 'super_admin' || 
-                        currentRole === 'owner' || 
-                        currentRole === 'admin';
-  
-  const redirectPath = hasAdminAccess ? '/admin/user-management' : '/dashboard/financial-dashboard';
-  return <Navigate to={redirectPath} replace />;
+  return <Navigate to="/login" replace />;
 };
 
 // App Routes Component
@@ -131,10 +139,21 @@ const AppRoutes: React.FC = () => {
           </PublicRoute>
         } 
       />
+      
       <Route 
-        path="/company-selector" 
-        element={<CompanySelectorRoute />}
+        path="/register" 
+        element={
+          <PublicRoute>
+            <Auth />
+          </PublicRoute>
+        } 
       />
+      
+      <Route 
+        path="/select-company" 
+        element={<CompanySelectionRoute />} 
+      />
+      
       <Route 
         path="/admin/*" 
         element={
@@ -145,6 +164,7 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         } 
       />
+      
       <Route 
         path="/dashboard/*" 
         element={
@@ -157,8 +177,9 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         } 
       />
+      
       <Route path="/" element={<SmartHomeRoute />} />
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

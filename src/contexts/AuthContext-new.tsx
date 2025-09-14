@@ -5,41 +5,24 @@ export interface Company {
   id: string;
   name: string;
   displayName: string;
-  email: string;
+  role: string;
+  permissions: string[];
+  status: string;
+  lastAccess?: string;
+  plan: string;
   industry: string;
-  subscription: {
-    plan: 'Free' | 'Startup' | 'Professional' | 'Enterprise';
-    status: 'active' | 'suspended' | 'cancelled' | 'expired';
+  settings?: {
+    baseCurrency: string;
+    timezone: string;
+    dateFormat: string;
+  };
+  subscription?: {
+    plan: string;
+    status: string;
     endDate: string;
     maxUsers: number;
     maxStorageGB: number;
   };
-  settings: {
-    baseCurrency: string;
-    fiscalYearStart: number;
-    timezone: string;
-  };
-}
-
-export interface UserCompany {
-  id: string;
-  role: 'owner' | 'admin' | 'manager' | 'accountant' | 'user' | 'viewer';
-  permissions: string[];
-  company: Company;
-  status: 'active' | 'pending' | 'suspended';
-  joinedAt: string;
-}
-
-// Interfaz para la respuesta simplificada del backend en login
-export interface UserCompanySimple {
-  id: string;
-  name: string;
-  displayName?: string;
-  role: 'owner' | 'admin' | 'manager' | 'accountant' | 'user' | 'viewer';
-  permissions: string[];
-  status: 'active' | 'pending' | 'suspended';
-  lastAccess?: string;
-  plan: string;
 }
 
 export interface User {
@@ -47,30 +30,29 @@ export interface User {
   email: string;
   name: string;
   username?: string;
+  avatar?: string;
   phone?: string;
   country?: string;
   globalRole: 'super_admin' | 'support' | 'user';
-  status: 'active' | 'pending' | 'suspended';
-  avatar?: string;
+  status: 'pending' | 'active' | 'suspended' | 'deactivated';
   preferences?: {
     language: string;
     timezone: string;
     currency: string;
+    theme: string;
   };
   hasCompanies: boolean;
-  companies: UserCompanySimple[]; // Cambiado a la estructura simplificada
+  companies: Company[];
+  lastLogin?: string;
 }
 
 export interface AuthState {
   user: User | null;
   selectedCompany: Company | null;
-  userCompanies: UserCompanySimple[];
-  currentRole: string | null;
-  currentPermissions: string[];
   isAuthenticated: boolean;
   isLoading: boolean;
-  error: string | null;
   needsCompanySelection: boolean;
+  error: string | null;
 }
 
 export interface LoginCredentials {
@@ -87,44 +69,35 @@ export interface RegisterData {
   username?: string;
   phone?: string;
   country?: string;
-  language?: string;
 }
 
 export interface CompanyData {
   name: string;
-  displayName?: string;
   email: string;
-  phone?: string;
   industry: string;
-  address?: {
-    country: string;
-    state?: string;
-    city?: string;
-  };
-  plan?: 'Free' | 'Startup' | 'Professional' | 'Enterprise';
+  country: string;
+  phone?: string;
+  description?: string;
 }
 
 type AuthAction =
   | { type: 'LOGIN_START' }
-  | { type: 'LOGIN_SUCCESS'; payload: { user: User; companies: UserCompanySimple[] } }
+  | { type: 'LOGIN_SUCCESS'; payload: { user: User } }
   | { type: 'LOGIN_FAILURE'; payload: string }
-  | { type: 'COMPANY_SELECTED'; payload: { company: Company; role: string; permissions: string[] } }
-  | { type: 'COMPANY_CREATED'; payload: { company: Company; role: string; permissions: string[] } }
+  | { type: 'COMPANY_SELECTED'; payload: { company: Company; token: string } }
+  | { type: 'COMPANY_CREATED'; payload: { company: Company; token: string } }
   | { type: 'LOGOUT' }
   | { type: 'CLEAR_ERROR' }
-  | { type: 'REGISTER_SUCCESS'; payload: { user: User } };
+  | { type: 'SET_LOADING'; payload: boolean };
 
 // Initial state
 const initialState: AuthState = {
   user: null,
   selectedCompany: null,
-  userCompanies: [],
-  currentRole: null,
-  currentPermissions: [],
   isAuthenticated: false,
   isLoading: true,
-  error: null,
   needsCompanySelection: false,
+  error: null,
 };
 
 // Reducer
@@ -140,72 +113,61 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return {
         ...state,
         user: action.payload.user,
-        userCompanies: action.payload.companies || [],
         isAuthenticated: true,
         isLoading: false,
+        needsCompanySelection: !action.payload.user.hasCompanies || action.payload.user.companies.length === 0,
         error: null,
-        needsCompanySelection: (action.payload.companies || []).length > 0,
       };
     case 'LOGIN_FAILURE':
       return {
         ...state,
         user: null,
         selectedCompany: null,
-        userCompanies: [],
-        currentRole: null,
-        currentPermissions: [],
         isAuthenticated: false,
         isLoading: false,
-        error: action.payload,
         needsCompanySelection: false,
+        error: action.payload,
       };
     case 'COMPANY_SELECTED':
       return {
         ...state,
         selectedCompany: action.payload.company,
-        currentRole: action.payload.role,
-        currentPermissions: action.payload.permissions,
         needsCompanySelection: false,
         isLoading: false,
+        error: null,
       };
     case 'COMPANY_CREATED':
       return {
         ...state,
         selectedCompany: action.payload.company,
-        currentRole: action.payload.role,
-        currentPermissions: action.payload.permissions,
-        userCompanies: [
-          ...state.userCompanies,
-          {
-            id: action.payload.company.id,
-            name: action.payload.company.name,
-            displayName: action.payload.company.displayName,
-            role: action.payload.role as any,
-            permissions: action.payload.permissions,
-            status: 'active' as const,
-            plan: action.payload.company.subscription?.plan || 'Free',
-          }
-        ],
         needsCompanySelection: false,
         isLoading: false,
+        error: null,
+        user: state.user ? {
+          ...state.user,
+          hasCompanies: true,
+          companies: [...state.user.companies, action.payload.company]
+        } : null,
       };
     case 'LOGOUT':
       return {
-        ...initialState,
+        ...state,
+        user: null,
+        selectedCompany: null,
+        isAuthenticated: false,
         isLoading: false,
+        needsCompanySelection: false,
+        error: null,
       };
     case 'CLEAR_ERROR':
       return {
         ...state,
         error: null,
       };
-    case 'REGISTER_SUCCESS':
+    case 'SET_LOADING':
       return {
         ...state,
-        user: action.payload.user,
-        isLoading: false,
-        error: null,
-        needsCompanySelection: false,
+        isLoading: action.payload,
       };
     default:
       return state;
@@ -217,7 +179,7 @@ interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   selectCompany: (companyId: string) => Promise<void>;
-  createCompany: (companyData: CompanyData) => Promise<void>;
+  createCompany: (data: CompanyData) => Promise<void>;
   logout: () => void;
   clearError: () => void;
 }
@@ -250,14 +212,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(result.message || 'Error de autenticación');
       }
 
-      const { user } = result.data;
-      const companies = user.companies || [];
+      const { token, user } = result.data;
 
-      // Guardar token y datos básicos - siempre guardamos para mantener sesión
-      localStorage.setItem('siaff_token', result.data.token);
-      localStorage.setItem('siaff_user', JSON.stringify(user));
+      // Guardar token básico
+      localStorage.setItem('siaff_token', token);
+      
+      if (credentials.rememberMe) {
+        localStorage.setItem('siaff_user', JSON.stringify(user));
+      }
 
-      dispatch({ type: 'LOGIN_SUCCESS', payload: { user, companies } });
+      dispatch({ type: 'LOGIN_SUCCESS', payload: { user } });
     } catch (error) {
       dispatch({ 
         type: 'LOGIN_FAILURE', 
@@ -294,9 +258,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(result.message || 'Error en el registro');
       }
 
-      const { user } = result.data;
-      
-      dispatch({ type: 'REGISTER_SUCCESS', payload: { user } });
+      const { token, user } = result.data;
+
+      // Guardar token básico
+      localStorage.setItem('siaff_token', token);
+      localStorage.setItem('siaff_user', JSON.stringify(user));
+
+      dispatch({ type: 'LOGIN_SUCCESS', payload: { user } });
       
     } catch (error) {
       dispatch({ 
@@ -309,8 +277,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const selectCompany = async (companyId: string): Promise<void> => {
     try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+
       const token = localStorage.getItem('siaff_token');
-      
       const response = await fetch('/api/auth/select-company', {
         method: 'POST',
         headers: {
@@ -323,35 +292,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Error seleccionando empresa');
+        throw new Error(result.message || 'Error al seleccionar empresa');
       }
 
-      const { selectedCompany, token: newToken } = result.data || {};
-      
-      // Extraer role y permissions de selectedCompany
-      const company = selectedCompany;
-      const role = selectedCompany?.role;
-      const permissions = selectedCompany?.permissions || [];
+      const { token: newToken, selectedCompany } = result.data;
 
       // Actualizar token con contexto de empresa
       localStorage.setItem('siaff_token', newToken);
-      localStorage.setItem('siaff_company', JSON.stringify(company));
+      localStorage.setItem('siaff_company', JSON.stringify(selectedCompany));
 
-      dispatch({ 
-        type: 'COMPANY_SELECTED', 
-        payload: { company, role, permissions } 
-      });
+      dispatch({ type: 'COMPANY_SELECTED', payload: { company: selectedCompany, token: newToken } });
     } catch (error) {
       dispatch({ 
         type: 'LOGIN_FAILURE', 
-        payload: error instanceof Error ? error.message : 'Error seleccionando empresa' 
+        payload: error instanceof Error ? error.message : 'Error al seleccionar empresa' 
       });
       throw error;
     }
   };
 
-  const createCompany = async (companyData: CompanyData): Promise<void> => {
+  const createCompany = async (data: CompanyData): Promise<void> => {
     try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+
       const token = localStorage.getItem('siaff_token');
       const response = await fetch('/api/auth/create-company', {
         method: 'POST',
@@ -359,29 +322,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(companyData),
+        body: JSON.stringify(data),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Error creando empresa');
+        throw new Error(result.message || 'Error al crear empresa');
       }
 
-      const { company, role, permissions, token: newToken } = result.data;
+      const { token: newToken, company } = result.data;
 
       // Actualizar token con contexto de empresa
       localStorage.setItem('siaff_token', newToken);
       localStorage.setItem('siaff_company', JSON.stringify(company));
 
-      dispatch({ 
-        type: 'COMPANY_CREATED', 
-        payload: { company, role, permissions } 
-      });
+      dispatch({ type: 'COMPANY_CREATED', payload: { company, token: newToken } });
     } catch (error) {
       dispatch({ 
         type: 'LOGIN_FAILURE', 
-        payload: error instanceof Error ? error.message : 'Error creando empresa' 
+        payload: error instanceof Error ? error.message : 'Error al crear empresa' 
       });
       throw error;
     }
@@ -400,7 +360,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Verificar si hay usuario guardado al inicializar
   React.useEffect(() => {
-    const initializeAuth = async () => {
+    const initializeAuth = () => {
       const savedUser = localStorage.getItem('siaff_user');
       const savedCompany = localStorage.getItem('siaff_company');
       const savedToken = localStorage.getItem('siaff_token');
@@ -410,49 +370,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const user = JSON.parse(savedUser);
           
           if (savedCompany) {
-            // Usuario ya tiene empresa seleccionada
+            // Usuario tiene empresa seleccionada
             const company = JSON.parse(savedCompany);
-            
-            // Verificar que el token sigue siendo válido
-            const response = await fetch('/api/auth/verify', {
-              headers: {
-                'Authorization': `Bearer ${savedToken}`,
-              },
-            });
-
-            if (response.ok) {
-              const result = await response.json();
-              dispatch({ 
-                type: 'COMPANY_SELECTED', 
-                payload: { 
-                  company, 
-                  role: result.data.role, 
-                  permissions: result.data.permissions 
-                } 
-              });
-              dispatch({ 
-                type: 'LOGIN_SUCCESS', 
-                payload: { user, companies: result.data.companies || [] } 
-              });
-            } else {
-              logout();
-            }
+            dispatch({ type: 'LOGIN_SUCCESS', payload: { user } });
+            dispatch({ type: 'COMPANY_SELECTED', payload: { company, token: savedToken } });
           } else {
             // Usuario logueado pero sin empresa seleccionada
-            dispatch({ 
-              type: 'LOGIN_SUCCESS', 
-              payload: { user, companies: [] } 
-            });
+            dispatch({ type: 'LOGIN_SUCCESS', payload: { user } });
           }
         } catch (error) {
-          logout();
+          // Datos corruptos, limpiar todo
+          localStorage.removeItem('siaff_user');
+          localStorage.removeItem('siaff_company');
+          localStorage.removeItem('siaff_token');
+          dispatch({ type: 'LOGOUT' });
         }
       } else {
         dispatch({ type: 'LOGOUT' });
       }
     };
 
-    initializeAuth();
+    // Pequeño delay para evitar flashing
+    const timer = setTimeout(initializeAuth, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const value: AuthContextType = {

@@ -2,15 +2,25 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Logo from '@/components/Logo';
 
-interface RegisterData {
+interface RegisterFormData {
+  // Datos de la empresa
+  companyName: string;
+  companyEmail: string;
+  companyPhone: string;
+  subdomain: string;
+  currency: string;
+  
+  // Datos del administrador
   fullName: string;
-  country: string;
-  countryCode: string;
-  phone: string;
   email: string;
   username: string;
   password: string;
   confirmPassword: string;
+  phone: string;
+  country: string;
+  countryCode: string;
+  
+  // Validaciones
   acceptTerms: boolean;
   isNotRobot: boolean;
 }
@@ -20,25 +30,35 @@ interface RegisterProps {
 }
 
 const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
-  const { isLoading, error, clearError } = useAuth();
-  const [formData, setFormData] = useState<RegisterData>({
+  const { register, isLoading, error, clearError } = useAuth();
+  const [formData, setFormData] = useState<RegisterFormData>({
+    // Datos de la empresa
+    companyName: '',
+    companyEmail: '',
+    companyPhone: '',
+    subdomain: '',
+    currency: 'USD',
+    
+    // Datos del administrador
     fullName: '',
-    country: '',
-    countryCode: '+503',
-    phone: '',
     email: '',
     username: '',
     password: '',
     confirmPassword: '',
+    phone: '',
+    country: '',
+    countryCode: '+503',
+    
+    // Validaciones
     acceptTerms: false,
     isNotRobot: false,
   });
-
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const layerBackRef = useRef<HTMLDivElement>(null);
   const layerFrontRef = useRef<HTMLDivElement>(null);
 
   const countries = [
+    { code: 'US', name: 'Estados Unidos', phone: '+1' },
     { code: 'SV', name: 'El Salvador', phone: '+503' },
     { code: 'GT', name: 'Guatemala', phone: '+502' },
     { code: 'HN', name: 'Honduras', phone: '+504' },
@@ -223,6 +243,11 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   const validateForm = (): boolean => {
     const errors: string[] = [];
 
+    // Validar datos de la empresa
+    if (!formData.companyName.trim()) errors.push('El nombre de la empresa es requerido');
+    if (!formData.companyEmail.trim()) errors.push('El email de la empresa es requerido');
+    
+    // Validar datos del administrador
     if (!formData.fullName.trim()) errors.push('El nombre completo es requerido');
     if (!formData.country) errors.push('Debe seleccionar un país');
     if (!formData.phone.trim()) errors.push('El teléfono es requerido');
@@ -234,8 +259,13 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
     if (!formData.acceptTerms) errors.push('Debe aceptar los términos y condiciones');
     if (!formData.isNotRobot) errors.push('Debe confirmar que no es un robot');
 
-    // Email validation
+    // Email validation para empresa
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.companyEmail && !emailRegex.test(formData.companyEmail)) {
+      errors.push('El formato del email de la empresa no es válido');
+    }
+
+    // Email validation para administrador
     if (formData.email && !emailRegex.test(formData.email)) {
       errors.push('El formato del correo electrónico no es válido');
     }
@@ -257,14 +287,34 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
     if (!validateForm()) return;
 
     try {
-      // Simular registro (aquí iría la llamada real al API)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Mapear los datos del formulario al formato del AuthContext
+      await register({
+        company: {
+          name: formData.companyName,
+          email: formData.companyEmail,
+          phone: formData.companyPhone,
+          country: formData.country,
+          subdomain: formData.subdomain || undefined,
+          currency: formData.currency
+        },
+        admin: {
+          name: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          username: formData.username,
+          phone: formData.phone,
+          countryCode: formData.countryCode,
+          country: formData.country,
+          language: 'es'
+        }
+      });
       
-      // Por ahora solo mostramos un alert
-      alert('¡Registro exitoso! Por favor verifica tu correo electrónico.');
-      onSwitchToLogin();
+      // El registro exitoso automáticamente logea al usuario
+      // El AuthContext maneja la redirección
+      
     } catch (error) {
-      setValidationErrors(['Error en el registro. Por favor intenta nuevamente.']);
+      // El error ya se maneja en el AuthContext
     }
   };
 
@@ -277,7 +327,7 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
       <div 
         className="fixed inset-0 opacity-15 z-0"
         style={{
-          backgroundImage: 'url(https://cdn.pixabay.com/photo/2020/03/31/11/33/sunset-4987300_960_720.jpg)',
+          backgroundImage: 'url(https://cdn.pixabay.com/photo/2023/03/21/20/42/umbrellas-7868179_1280.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
@@ -320,124 +370,223 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
               )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Full Name */}
-              <div className="form-group">
-                <label className="block text-sm font-semibold mb-2 text-gray-600">
-                  Nombre Completo <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
-                  required
-                />
-              </div>
-
-              {/* Country */}
-              <div className="form-group">
-                <label className="block text-sm font-semibold mb-2 text-gray-600">
-                  País <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="country"
-                  value={formData.country}
-                  onChange={handleChange}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
-                  required
-                >
-                  <option value="">Seleccionar país</option>
-                  {countries.map(country => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Phone */}
-              <div className="form-group">
-                <label className="block text-sm font-semibold mb-2 text-gray-600">
-                  Contacto <span className="text-red-500">*</span>
-                </label>
-                <div className="flex gap-2">
+              {/* Información de la Empresa */}
+              <div className="border-b pb-4 mb-4">
+                <h3 className="text-lg font-semibold text-gray-700 mb-3">Información de la Empresa</h3>
+                
+                {/* Company Name */}
+                <div className="form-group mb-3">
+                  <label className="block text-sm font-semibold mb-2 text-gray-600">
+                    Nombre de la Empresa <span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
-                    value={formData.countryCode}
-                    className="w-20 p-3 border-2 border-gray-200 rounded-lg text-sm bg-gray-100 text-gray-600 outline-none"
-                    readOnly
-                  />
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
+                    name="companyName"
+                    value={formData.companyName}
                     onChange={handleChange}
-                    placeholder="7000-0000"
-                    className="flex-1 p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                    className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
                     required
                   />
                 </div>
+
+                {/* Company Email */}
+                <div className="form-group mb-3">
+                  <label className="block text-sm font-semibold mb-2 text-gray-600">
+                    Email de la Empresa <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="companyEmail"
+                    value={formData.companyEmail}
+                    onChange={handleChange}
+                    className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                    required
+                  />
+                </div>
+
+                {/* Company Phone */}
+                <div className="form-group mb-3">
+                  <label className="block text-sm font-semibold mb-2 text-gray-600">
+                    Teléfono de la Empresa
+                  </label>
+                  <input
+                    type="tel"
+                    name="companyPhone"
+                    value={formData.companyPhone}
+                    onChange={handleChange}
+                    placeholder="2500-0000"
+                    className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Subdomain */}
+                  <div className="form-group">
+                    <label className="block text-sm font-semibold mb-2 text-gray-600">
+                      Subdominio
+                    </label>
+                    <input
+                      type="text"
+                      name="subdomain"
+                      value={formData.subdomain}
+                      onChange={handleChange}
+                      placeholder="mi-empresa"
+                      className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Opcional. Se generará automáticamente si no se especifica.</p>
+                  </div>
+
+                  {/* Currency */}
+                  <div className="form-group">
+                    <label className="block text-sm font-semibold mb-2 text-gray-600">
+                      Moneda Principal
+                    </label>
+                    <select
+                      name="currency"
+                      value={formData.currency}
+                      onChange={handleChange}
+                      className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                    >
+                      <option value="USD">USD - Dólar Estadounidense</option>
+                      <option value="EUR">EUR - Euro</option>
+                      <option value="MXN">MXN - Peso Mexicano</option>
+                      <option value="CRC">CRC - Colón Costarricense</option>
+                      <option value="GTQ">GTQ - Quetzal Guatemalteco</option>
+                      <option value="HNL">HNL - Lempira Hondureña</option>
+                      <option value="NIO">NIO - Córdoba Nicaragüense</option>
+                      <option value="PAB">PAB - Balboa Panameña</option>
+                      <option value="DOP">DOP - Peso Dominicano</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              {/* Email */}
-              <div className="form-group">
-                <label className="block text-sm font-semibold mb-2 text-gray-600">
-                  Correo Electrónico <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
-                  required
-                />
-              </div>
+              {/* Información del Administrador */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-700 mb-3">Administrador Principal</h3>
+                
+                {/* Full Name */}
+                <div className="form-group mb-3">
+                  <label className="block text-sm font-semibold mb-2 text-gray-600">
+                    Nombre Completo <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                    required
+                  />
+                </div>
 
-              {/* Username */}
-              <div className="form-group">
-                <label className="block text-sm font-semibold mb-2 text-gray-600">
-                  Usuario <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
-                  required
-                />
-              </div>
+                {/* Email */}
+                <div className="form-group mb-3">
+                  <label className="block text-sm font-semibold mb-2 text-gray-600">
+                    Correo Electrónico <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                    required
+                  />
+                </div>
 
-              {/* Password */}
-              <div className="form-group">
-                <label className="block text-sm font-semibold mb-2 text-gray-600">
-                  Contraseña <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
-                  required
-                />
-              </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Username */}
+                  <div className="form-group">
+                    <label className="block text-sm font-semibold mb-2 text-gray-600">
+                      Usuario
+                    </label>
+                    <input
+                      type="text"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                    />
+                  </div>
 
-              {/* Confirm Password */}
-              <div className="form-group">
-                <label className="block text-sm font-semibold mb-2 text-gray-600">
-                  Verificación de Contraseña <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
-                  required
-                />
+                  {/* Country */}
+                  <div className="form-group">
+                    <label className="block text-sm font-semibold mb-2 text-gray-600">
+                      País <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="country"
+                      value={formData.country}
+                      onChange={handleChange}
+                      className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                      required
+                    >
+                      <option value="">Seleccionar país</option>
+                      {countries.map(country => (
+                        <option key={country.code} value={country.code}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="form-group mb-3">
+                  <label className="block text-sm font-semibold mb-2 text-gray-600">
+                    Teléfono Personal <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={formData.countryCode}
+                      className="w-20 p-3 border-2 border-gray-200 rounded-lg text-sm bg-gray-100 text-gray-600 outline-none"
+                      readOnly
+                    />
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="7000-0000"
+                      className="flex-1 p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="form-group">
+                    <label className="block text-sm font-semibold mb-2 text-gray-600">
+                      Contraseña <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                      required
+                    />
+                  </div>
+
+                  {/* Confirm Password */}
+                  <div className="form-group">
+                    <label className="block text-sm font-semibold mb-2 text-gray-600">
+                      Confirmar Contraseña <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full p-3 border-2 border-gray-200 rounded-lg text-sm bg-white text-gray-600 outline-none transition-all duration-200 focus:border-gray-800 focus:shadow-[0_0_0_3px_rgba(0,0,0,0.1)]"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Terms */}
@@ -480,10 +629,10 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
                 {isLoading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Registrando...
+                    Creando Cuenta...
                   </div>
                 ) : (
-                  'Listo'
+                  'Crear Empresa'
                 )}
               </button>
             </form>

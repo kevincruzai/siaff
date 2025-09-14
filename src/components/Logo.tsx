@@ -33,7 +33,7 @@ const Logo: React.FC<LogoProps> = ({
       />
       {showText && (
         <span className={`font-bold tracking-tight ${sizeClasses[size].text} ${colorClasses[variant]}`}>
-          
+          SIAFF
         </span>
       )}
     </div>

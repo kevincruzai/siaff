@@ -169,3 +169,8 @@
     box-shadow: 0 0 0 8px rgba(102, 126, 234, 0);
   }
 }
+
+/* Ocultar créditos de Highcharts */
+.highcharts-credits {
+  display: none !important;
+}

@@ -98,10 +98,10 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
         
         setTimeout(() => {
           el.style.color = 'rgba(255, 255, 255, 0.8)';
-        }, 1000);
+        }, 500); // ← Cambio de color más rápido
       };
       
-      const updateInterval = setInterval(updateValue, rand(2000, 4000));
+      const updateInterval = setInterval(updateValue, rand(800, 1500)); // ← Más rápido
       setTimeout(() => clearInterval(updateInterval), 60000);
       updateValue();
     };
@@ -156,8 +156,8 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
       el.style.setProperty('--x1', x1 + 'vw');
       el.style.setProperty('--y1', y1 + 'vh');
       el.style.setProperty('--z', depth * -300 + 'px');
-      el.style.setProperty('--dur', rand(35, 55) + 's');
-      el.style.setProperty('--delay', rand(0, 15) + 's');
+      el.style.setProperty('--dur', rand(20, 35) + 's'); // ← Animaciones más rápidas
+      el.style.setProperty('--delay', rand(0, 3) + 's'); // ← Delays mucho menores
       el.style.setProperty('--sx', rand(0.85, 1.1).toFixed(2));
 
       layer.appendChild(el);
@@ -167,7 +167,7 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
     const populate = () => {
       if (!layerBackRef.current || !layerFrontRef.current) return;
       
-      const count = 24;
+      const count = 36; // ← Más elementos para llenar rápido
       layerBackRef.current.innerHTML = '';
       layerFrontRef.current.innerHTML = '';
       

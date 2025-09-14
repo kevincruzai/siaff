@@ -5,6 +5,32 @@ Está orientado a PYMEs, corporativos y organizaciones que buscan mejorar su ges
 
 ---
 
+## CREDENCIALES
+🔑 **Sistema Multitenant - Credenciales de Prueba:**
+
+**Admin del Sistema:**
+- Email: admin@siaff.net
+- Password: admin123
+- Tipo: Super administrador
+- Redirección: /admin/user-management
+
+**CEO con Múltiples Empresas:**
+- Email: ceo@holding.com
+- Password: ceo123
+- Empresas: Premium Restaurants, Constructora Valle, Holding CA
+- Roles: Owner en todas las empresas
+
+**Usuario Regular:**
+- Email: user@siaff.net
+- Password: user123
+- Redirección: /dashboard/financial-dashboard
+
+**Nuevo Sistema Multitenant:**
+- ✅ Un usuario puede manejar múltiples empresas
+- ✅ Roles específicos por empresa (owner, admin, manager, etc.)
+- ✅ Selección de empresa después del login
+- ✅ Sin necesidad de subdominios
+
 ## 🎯 Propósito
 
 El objetivo de SIAFF es **simplificar la toma de decisiones financieras** mediante la automatización de procesos clave, la centralización de información y la generación de reportes en tiempo real.  
