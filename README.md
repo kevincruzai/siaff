@@ -25,6 +25,12 @@ Está orientado a PYMEs, corporativos y organizaciones que buscan mejorar su ges
 - Password: user123
 - Redirección: /dashboard/financial-dashboard
 
+## 🌐 Demo Online (ngrok)
+Para mostrar el proyecto al cliente, está configurado ngrok:
+- ✅ Host permitido: `cd7f3c8f3729.ngrok-free.app`
+- ✅ CORS configurado para múltiples dominios
+- 📝 Ver `ngrok-setup.md` para instrucciones completas
+
 **Nuevo Sistema Multitenant:**
 - ✅ Un usuario puede manejar múltiples empresas
 - ✅ Roles específicos por empresa (owner, admin, manager, etc.)

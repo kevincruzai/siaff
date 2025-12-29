@@ -24,16 +24,24 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; adminOnly?: boolean 
     return <Navigate to="/login" replace />;
   }
 
-  // Si el usuario necesita seleccionar una empresa
+  // Si es super admin, no necesita selección de empresa
+  if (user?.globalRole === 'super_admin') {
+    // Verificar permisos de admin para super admins
+    if (adminOnly) {
+      // Super admins siempre tienen acceso admin
+      return <>{children}</>;
+    }
+    return <>{children}</>;
+  }
+
+  // Para usuarios normales, verificar si necesita selección de empresa
   if (needsCompanySelection || !selectedCompany) {
     return <Navigate to="/company-selector" replace />;
   }
 
   // Verificar permisos de admin basado en el nuevo sistema de roles
   if (adminOnly) {
-    const hasAdminAccess = user?.globalRole === 'super_admin' || 
-                          currentRole === 'owner' || 
-                          currentRole === 'admin';
+    const hasAdminAccess = currentRole === 'owner' || currentRole === 'admin';
     
     if (!hasAdminAccess) {
       return <Navigate to="/dashboard/financial-dashboard" replace />;
@@ -45,7 +53,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; adminOnly?: boolean 
 
 // Public Route Component (redirect if authenticated)
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isLoading, needsCompanySelection, selectedCompany } = useAuth();
+  const { isAuthenticated, isLoading, needsCompanySelection, selectedCompany, user } = useAuth();
   
   if (isLoading) {
     return (
@@ -56,6 +64,11 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
   
   if (isAuthenticated) {
+    // Si es super admin, redirigir directamente al panel de administración
+    if (user?.globalRole === 'super_admin') {
+      return <Navigate to="/admin/user-management" replace />;
+    }
+    
     if (needsCompanySelection || !selectedCompany) {
       return <Navigate to="/company-selector" replace />;
     }
@@ -68,7 +81,7 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 // Company Selection Route Component
 const CompanySelectorRoute: React.FC = () => {
-  const { isAuthenticated, isLoading, needsCompanySelection, selectedCompany } = useAuth();
+  const { isAuthenticated, isLoading, needsCompanySelection, selectedCompany, user } = useAuth();
   
   if (isLoading) {
     return (
@@ -80,6 +93,11 @@ const CompanySelectorRoute: React.FC = () => {
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+  
+  // Si es super admin, redirigir directamente al panel de administración
+  if (user?.globalRole === 'super_admin') {
+    return <Navigate to="/admin/user-management" replace />;
   }
   
   // Si ya tiene empresa seleccionada, redirigir al dashboard
@@ -106,14 +124,17 @@ const SmartHomeRoute: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
   
+  // Si es super admin, redirigir directamente al panel de administración
+  if (user?.globalRole === 'super_admin') {
+    return <Navigate to="/admin/user-management" replace />;
+  }
+  
   if (needsCompanySelection || !selectedCompany) {
     return <Navigate to="/company-selector" replace />;
   }
   
   // Redirigir según el rol del usuario
-  const hasAdminAccess = user?.globalRole === 'super_admin' || 
-                        currentRole === 'owner' || 
-                        currentRole === 'admin';
+  const hasAdminAccess = currentRole === 'owner' || currentRole === 'admin';
   
   const redirectPath = hasAdminAccess ? '/admin/user-management' : '/dashboard/financial-dashboard';
   return <Navigate to={redirectPath} replace />;

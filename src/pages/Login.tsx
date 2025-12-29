@@ -101,7 +101,7 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
         }, 500); // ← Cambio de color más rápido
       };
       
-      const updateInterval = setInterval(updateValue, rand(800, 1500)); // ← Más rápido
+      const updateInterval = setInterval(updateValue, rand(1500, 3000)); // ← Más lento para suavizar
       setTimeout(() => clearInterval(updateInterval), 60000);
       updateValue();
     };
@@ -133,21 +133,21 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
       if (direction < 0.4) {
         animationName = 'driftFromLeft';
         x0 = rand(10, 40);
-        y0 = rand(15, 85);
+        y0 = rand(10, 90); // ← Rango vertical más amplio
         x1 = rand(60, 90);
-        y1 = y0 + rand(-15, 15);
+        y1 = y0 + rand(-20, 20); // ← Mayor variación vertical
       } else if (direction < 0.8) {
         animationName = 'driftFromRight';
         x0 = rand(60, 90);
-        y0 = rand(15, 85);
+        y0 = rand(10, 90); // ← Rango vertical más amplio
         x1 = rand(10, 40);
-        y1 = y0 + rand(-15, 15);
+        y1 = y0 + rand(-20, 20); // ← Mayor variación vertical
       } else {
         animationName = 'driftFromCenter';
         x0 = rand(30, 70);
-        y0 = rand(20, 80);
+        y0 = rand(15, 85); // ← Mejor distribución vertical
         x1 = rand(25, 75);
-        y1 = rand(20, 80);
+        y1 = rand(15, 85); // ← Rango vertical distribuido
       }
 
       el.style.setProperty('--animation-name', animationName);
@@ -156,8 +156,8 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
       el.style.setProperty('--x1', x1 + 'vw');
       el.style.setProperty('--y1', y1 + 'vh');
       el.style.setProperty('--z', depth * -300 + 'px');
-      el.style.setProperty('--dur', rand(20, 35) + 's'); // ← Animaciones más rápidas
-      el.style.setProperty('--delay', rand(0, 3) + 's'); // ← Delays mucho menores
+      el.style.setProperty('--dur', rand(35, 50) + 's'); // ← Animaciones más lentas y suaves
+      el.style.setProperty('--delay', rand(0, 8) + 's'); // ← Delays más largos para mejor distribución
       el.style.setProperty('--sx', rand(0.85, 1.1).toFixed(2));
 
       layer.appendChild(el);
@@ -167,7 +167,7 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
     const populate = () => {
       if (!layerBackRef.current || !layerFrontRef.current) return;
       
-      const count = 36; // ← Más elementos para llenar rápido
+      const count = 24; // ← Menos elementos para evitar saturación
       layerBackRef.current.innerHTML = '';
       layerFrontRef.current.innerHTML = '';
       

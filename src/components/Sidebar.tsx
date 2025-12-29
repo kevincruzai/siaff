@@ -35,7 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, selectedCompany, currentRole } = useAuth();
-  const [expandedMenus, setExpandedMenus] = useState<string[]>(['finanzas-corporativas']);
+  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
   const toggleMenu = (menuId: string) => {
     setExpandedMenus(prev => 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Plus, ChevronRight, Users, Calendar, Crown, Shield, Star, Package } from 'lucide-react';
+import { Building2, Plus, ChevronRight, Users, Calendar, Crown, Shield, Star, Package, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface Company {
@@ -26,7 +26,7 @@ interface CompanyFormData {
 
 const CompanySelector: React.FC = () => {
   const navigate = useNavigate();
-  const { user, selectCompany, createCompany } = useAuth();
+  const { user, selectCompany, createCompany, logout } = useAuth();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -180,11 +180,25 @@ const CompanySelector: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                <Building2 className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-between mb-4">
+              <div></div> {/* Espaciador */}
+              <div className="flex items-center justify-center">
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                  <Building2 className="w-6 h-6 text-white" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900">Seleccionar Empresa</h1>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900">Seleccionar Empresa</h1>
+              <button
+                onClick={() => {
+                  logout();
+                  navigate('/login');
+                }}
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                title="Cerrar Sesión"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="hidden sm:inline">Cerrar Sesión</span>
+              </button>
             </div>
             <p className="text-gray-600">
               Selecciona la empresa con la que deseas trabajar o crea una nueva

@@ -1,35 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Shield, CheckCircle, XCircle, Clock, Mail, Building, User, Search, Home, ChevronRight, AlertCircle } from 'lucide-react';
 import MainLayout from '../components/MainLayout';
-
-interface Company {
-  id: string;
-  name: string;
-  subdomain: string;
-  plan?: string;
-}
+import API_CONFIG from '../config/api';
 
 interface UserData {
   id: string;
-  name: string;
-  email: string;
-  username?: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    username?: string;
+    phone?: string;
+    country?: string;
+    status: string;
+  };
+  company: {
+    id: string;
+    name: string;
+    displayName: string;
+    industry?: string;
+    subscription?: string;
+  };
   role: string;
   status: 'pending' | 'active' | 'suspended' | 'rejected';
-  company: Company | null;
-  department?: string;
-  position?: string;
-  phone?: string;
-  country?: string;
   permissions?: string[];
-  isActive: boolean;
-  lastLogin?: string;
-  requestDate?: string;
-  approvedAt?: string;
-  approvedBy?: string;
-  rejectedAt?: string;
-  rejectedBy?: string;
-  rejectionReason?: string;
+  joinedAt?: string;
+  lastAccessAt?: string;
+  invitedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -42,14 +39,6 @@ interface UserStats {
   total: number;
 }
 
-interface CompanyStats {
-  Free: number;
-  Startup: number;
-  Professional: number;
-  Enterprise: number;
-  total: number;
-}
-
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [stats, setStats] = useState<UserStats>({
@@ -59,7 +48,6 @@ const UserManagement: React.FC = () => {
     rejected: 0,
     total: 0
   });
-  const [companyStats, setCompanyStats] = useState<CompanyStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,8 +57,9 @@ const UserManagement: React.FC = () => {
   // Función para obtener estadísticas
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/admin/stats', {
+      const token = localStorage.getItem('siaff_token');
+      const baseURL = API_CONFIG.getBaseURL();
+      const response = await fetch(`${baseURL}/api/admin/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -84,9 +73,6 @@ const UserManagement: React.FC = () => {
       const data = await response.json();
       if (data.status === 'success') {
         setStats(data.data.userStats);
-        if (data.data.companyStats) {
-          setCompanyStats(data.data.companyStats);
-        }
       }
     } catch (err) {
       console.error('Error fetching stats:', err);
@@ -97,8 +83,9 @@ const UserManagement: React.FC = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/admin/users', {
+      const token = localStorage.getItem('siaff_token');
+      const baseURL = API_CONFIG.getBaseURL();
+      const response = await fetch(`${baseURL}/api/admin/users`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -132,8 +119,8 @@ const UserManagement: React.FC = () => {
   // Filtrar usuarios
   const filteredUsers = users.filter(user => {
     const matchesFilter = filter === 'all' || user.status === filter;
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = (user.user?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (user.user?.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (user.company?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
@@ -141,8 +128,9 @@ const UserManagement: React.FC = () => {
   // Función para aprobar usuario
   const handleApprove = async (userId: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/admin/users/${userId}/approve`, {
+      const token = localStorage.getItem('siaff_token');
+      const baseURL = API_CONFIG.getBaseURL();
+      const response = await fetch(`${baseURL}/api/admin/users/${userId}/approve`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -174,8 +162,9 @@ const UserManagement: React.FC = () => {
   // Función para rechazar usuario
   const handleReject = async (userId: string, reason: string) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/admin/users/${userId}/reject`, {
+      const token = localStorage.getItem('siaff_token');
+      const baseURL = API_CONFIG.getBaseURL();
+      const response = await fetch(`${baseURL}/api/admin/users/${userId}/reject`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -418,7 +407,7 @@ const UserManagement: React.FC = () => {
                 <tr>
                   <th className="text-left p-4 font-semibold text-gray-700">Usuario</th>
                   <th className="text-left p-4 font-semibold text-gray-700">Empresa</th>
-                  <th className="text-left p-4 font-semibold text-gray-700">Departamento</th>
+                  <th className="text-left p-4 font-semibold text-gray-700">País</th>
                   <th className="text-center p-4 font-semibold text-gray-700">Rol</th>
                   <th className="text-center p-4 font-semibold text-gray-700">Fecha Registro</th>
                   <th className="text-center p-4 font-semibold text-gray-700">Estado</th>
@@ -434,10 +423,10 @@ const UserManagement: React.FC = () => {
                           <User className="w-5 h-5 text-gray-600" />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">{user.name}</p>
+                          <p className="font-medium text-gray-900">{user.user.name}</p>
                           <p className="text-sm text-gray-600 flex items-center gap-1">
                             <Mail className="w-3 h-3" />
-                            {user.email}
+                            {user.user.email}
                           </p>
                         </div>
                       </div>
@@ -448,20 +437,17 @@ const UserManagement: React.FC = () => {
                         <span className="text-gray-900">{user.company?.name || 'Sin empresa'}</span>
                       </div>
                     </td>
-                    <td className="p-4 text-gray-700">{user.department || '-'}</td>
+                    <td className="p-4 text-gray-700">{user.user.country || '-'}</td>
                     <td className="p-4 text-center">
                       <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
                         {user.role}
                       </span>
                     </td>
                     <td className="p-4 text-center text-gray-700">
-                      {user.requestDate ? new Date(user.requestDate).toLocaleDateString() : new Date(user.createdAt).toLocaleDateString()}
+                      {user.invitedAt ? new Date(user.invitedAt).toLocaleDateString() : new Date(user.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-4 text-center">
                       {getStatusBadge(user.status)}
-                      {user.rejectionReason && (
-                        <p className="text-xs text-gray-500 mt-1">{user.rejectionReason}</p>
-                      )}
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-center gap-2">

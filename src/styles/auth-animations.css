@@ -10,6 +10,8 @@
   opacity: 0; font-size: 0.8rem;
   animation: var(--animation-name) var(--dur, 35s) ease-in-out var(--delay, 0s) infinite;
   will-change: transform, opacity;
+  padding: 2px 4px; /* ← Agregar padding para evitar overlapping */
+  margin: 3px; /* ← Agregar margen para separación */
 }
 
 .financial-greet.money {
@@ -21,7 +23,7 @@
 @keyframes driftFromLeft {
   0% { 
     opacity: 0; 
-    transform: translate3d(calc(var(--x0) - 30vw), var(--y0), var(--z)) scale(calc(var(--sx) * 0.8));
+    transform: translate3d(calc(var(--x0) - 30vw), calc(var(--y0) - 5vh), var(--z)) scale(calc(var(--sx) * 0.8));
     filter: blur(3px);
   }
   20% { 
@@ -33,7 +35,7 @@
   }
   100% { 
     opacity: 0; 
-    transform: translate3d(calc(var(--x1) + 25vw), var(--y1), var(--z)) scale(calc(var(--sx) * 0.9));
+    transform: translate3d(calc(var(--x1) + 25vw), calc(var(--y1) + 5vh), var(--z)) scale(calc(var(--sx) * 0.9));
     filter: blur(2px);
   }
 }
@@ -41,7 +43,7 @@
 @keyframes driftFromRight {
   0% { 
     opacity: 0; 
-    transform: translate3d(calc(var(--x0) + 30vw), var(--y0), var(--z)) scale(calc(var(--sx) * 0.8));
+    transform: translate3d(calc(var(--x0) + 30vw), calc(var(--y0) - 5vh), var(--z)) scale(calc(var(--sx) * 0.8));
     filter: blur(3px);
   }
   20% { 
@@ -53,7 +55,7 @@
   }
   100% { 
     opacity: 0; 
-    transform: translate3d(calc(var(--x1) - 25vw), var(--y1), var(--z)) scale(calc(var(--sx) * 0.9));
+    transform: translate3d(calc(var(--x1) - 25vw), calc(var(--y1) + 5vh), var(--z)) scale(calc(var(--sx) * 0.9));
     filter: blur(2px);
   }
 }
@@ -61,7 +63,7 @@
 @keyframes driftFromCenter {
   0% { 
     opacity: 0; 
-    transform: translate3d(var(--x0), calc(var(--y0) - 15vh), var(--z)) scale(calc(var(--sx) * 0.7));
+    transform: translate3d(var(--x0), calc(var(--y0) - 20vh), var(--z)) scale(calc(var(--sx) * 0.7));
     filter: blur(4px);
   }
   25% { 
@@ -73,7 +75,7 @@
   }
   100% { 
     opacity: 0; 
-    transform: translate3d(var(--x1), calc(var(--y1) + 10vh), var(--z)) scale(var(--sx));
+    transform: translate3d(var(--x1), calc(var(--y1) + 15vh), var(--z)) scale(var(--sx));
     filter: blur(2px);
   }
 }

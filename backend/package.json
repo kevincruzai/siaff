@@ -7,11 +7,20 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "seed": "node src/seeds/index.js",
     "seed:dev": "NODE_ENV=development node src/seeds/index.js",
     "seed:new": "node src/seeds/index-new.js",
     "seed:new:dev": "NODE_ENV=development node src/seeds/index-new.js",
-    "migrate:multitenant": "node migrate-to-multitenant.js"
+    "migrate:multitenant": "node migrate-to-multitenant.js",
+    "lint": "eslint . --ext js",
+    "lint:fix": "eslint . --ext js --fix",
+    "format": "prettier --write \"src/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\"",
+    "clean": "rimraf logs/*.log",
+    "docker:build": "docker build -t siaff-backend .",
+    "docker:run": "docker run -p 5000:5000 --env-file .env siaff-backend"
   },
   "keywords": [
     "siaff",
