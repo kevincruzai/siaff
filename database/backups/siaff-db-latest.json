@@ -1,0 +1,630 @@
+{
+  "exportDate": "2025-12-29T22:41:55.181Z",
+  "version": "2.0.0-multitenant",
+  "database": "siaff-db",
+  "collections": {
+    "users": [
+      {
+        "_id": "68c5ffb827b9b61066d1eb4b",
+        "name": "SIAFF Administrator",
+        "email": "admin@siaff.net",
+        "username": "superadmin",
+        "avatar": null,
+        "preferences": {
+          "language": "es",
+          "timezone": "America/El_Salvador",
+          "currency": "USD",
+          "theme": "light"
+        },
+        "status": "active",
+        "isActive": true,
+        "emailVerified": false,
+        "globalRole": "super_admin",
+        "loginAttempts": 0,
+        "createdAt": "2025-09-13T23:35:20.747Z",
+        "updatedAt": "2025-12-24T15:46:37.052Z",
+        "__v": 0,
+        "lastActivity": "2025-12-24T15:46:37.052Z",
+        "lastLogin": "2025-12-24T15:46:37.052Z"
+      },
+      {
+        "_id": "68c5ffb927b9b61066d1eb5f",
+        "name": "María Elena Rodríguez",
+        "email": "maria@empresa.com",
+        "username": "maria.rodriguez",
+        "phone": "+503 7555-0101",
+        "country": "El Salvador",
+        "avatar": null,
+        "preferences": {
+          "language": "es",
+          "timezone": "America/El_Salvador",
+          "currency": "USD",
+          "theme": "light"
+        },
+        "status": "active",
+        "isActive": true,
+        "emailVerified": false,
+        "globalRole": "user",
+        "loginAttempts": 0,
+        "createdAt": "2025-09-13T23:35:21.138Z",
+        "updatedAt": "2025-09-13T23:35:21.138Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffb927b9b61066d1eb64",
+        "name": "Carlos Alberto Gómez",
+        "email": "carlos@empresa.com",
+        "username": "carlos.gomez",
+        "phone": "+503 7555-0102",
+        "country": "El Salvador",
+        "avatar": null,
+        "preferences": {
+          "language": "es",
+          "timezone": "America/El_Salvador",
+          "currency": "USD",
+          "theme": "light"
+        },
+        "status": "active",
+        "isActive": true,
+        "emailVerified": false,
+        "globalRole": "user",
+        "loginAttempts": 0,
+        "createdAt": "2025-09-13T23:35:21.512Z",
+        "updatedAt": "2025-09-13T23:35:21.512Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffb927b9b61066d1eb68",
+        "name": "Ana Sofía Martínez",
+        "email": "ana@empresa.com",
+        "username": "ana.martinez",
+        "phone": "+503 7555-0103",
+        "country": "El Salvador",
+        "avatar": null,
+        "preferences": {
+          "language": "es",
+          "timezone": "America/El_Salvador",
+          "currency": "USD",
+          "theme": "light"
+        },
+        "status": "active",
+        "isActive": true,
+        "emailVerified": false,
+        "globalRole": "user",
+        "loginAttempts": 0,
+        "createdAt": "2025-09-13T23:35:21.870Z",
+        "updatedAt": "2025-09-13T23:35:21.870Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffba27b9b61066d1eb6c",
+        "name": "Roberto Jiménez",
+        "email": "roberto@empresa.com",
+        "username": "roberto.jimenez",
+        "phone": "+503 7555-0104",
+        "country": "El Salvador",
+        "avatar": null,
+        "preferences": {
+          "language": "es",
+          "timezone": "America/El_Salvador",
+          "currency": "USD",
+          "theme": "light"
+        },
+        "status": "active",
+        "isActive": true,
+        "emailVerified": false,
+        "globalRole": "user",
+        "loginAttempts": 0,
+        "createdAt": "2025-09-13T23:35:22.191Z",
+        "updatedAt": "2025-09-13T23:35:22.191Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffba27b9b61066d1eb72",
+        "name": "Juan Carlos Pérez",
+        "email": "juan@techstart.sv",
+        "username": "juan.perez",
+        "phone": "+503 7888-0200",
+        "country": "El Salvador",
+        "avatar": null,
+        "preferences": {
+          "language": "es",
+          "timezone": "America/El_Salvador",
+          "currency": "USD",
+          "theme": "light"
+        },
+        "status": "active",
+        "isActive": true,
+        "emailVerified": false,
+        "globalRole": "user",
+        "loginAttempts": 0,
+        "createdAt": "2025-09-13T23:35:22.514Z",
+        "updatedAt": "2025-09-13T23:35:22.514Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffba27b9b61066d1eb78",
+        "name": "Elena Vásquez",
+        "email": "ceo@holding.com",
+        "username": "elena.vasquez",
+        "phone": "+503 7999-0001",
+        "country": "El Salvador",
+        "avatar": null,
+        "preferences": {
+          "language": "es",
+          "timezone": "America/El_Salvador",
+          "currency": "USD",
+          "theme": "light"
+        },
+        "status": "active",
+        "isActive": true,
+        "emailVerified": false,
+        "globalRole": "user",
+        "createdAt": "2025-09-13T23:35:22.853Z",
+        "updatedAt": "2025-12-24T15:47:09.056Z",
+        "__v": 0,
+        "lastActivity": "2025-12-24T15:47:09.056Z",
+        "lastLogin": "2025-12-24T15:47:09.055Z",
+        "loginAttempts": 0
+      }
+    ],
+    "companies": [
+      {
+        "_id": "68c5ffb927b9b61066d1eb5c",
+        "name": "Empresa Demo S.A.",
+        "displayName": "Empresa Demo",
+        "email": "demo@empresa.com",
+        "phone": "+503 2555-0100",
+        "address": {
+          "street": "Av. Principal #123",
+          "city": "San Salvador",
+          "state": "San Salvador",
+          "postalCode": "01101",
+          "country": "El Salvador"
+        },
+        "taxId": "0614-123456-123-4",
+        "industry": "Comercio",
+        "subscription": {
+          "plan": "Professional",
+          "status": "active",
+          "startDate": "2025-09-13T23:35:21.125Z",
+          "endDate": "2026-09-13T23:35:21.125Z",
+          "maxUsers": 50,
+          "maxStorageGB": 50
+        },
+        "settings": {
+          "baseCurrency": "USD",
+          "fiscalYearStart": 1,
+          "timezone": "America/El_Salvador",
+          "dateFormat": "DD/MM/YYYY",
+          "numberFormat": {
+            "decimalSeparator": ".",
+            "thousandsSeparator": ","
+          }
+        },
+        "status": "active",
+        "isActive": true,
+        "logo": null,
+        "onboarding": {
+          "isCompleted": false,
+          "completedSteps": []
+        },
+        "createdAt": "2025-09-13T23:35:21.128Z",
+        "updatedAt": "2025-09-13T23:35:21.500Z",
+        "__v": 0,
+        "createdBy": "68c5ffb927b9b61066d1eb5f"
+      },
+      {
+        "_id": "68c5ffba27b9b61066d1eb70",
+        "name": "TechStart SV",
+        "displayName": "TechStart El Salvador",
+        "email": "info@techstart.sv",
+        "phone": "+503 2333-4000",
+        "address": {
+          "street": "Centro Comercial Multiplaza, Local 2-15",
+          "city": "Antiguo Cuscatlán",
+          "state": "La Libertad",
+          "postalCode": "01101",
+          "country": "El Salvador"
+        },
+        "taxId": "0614-654321-654-1",
+        "industry": "Tecnología",
+        "subscription": {
+          "plan": "Startup",
+          "status": "active",
+          "startDate": "2025-09-13T23:35:22.511Z",
+          "endDate": "2026-09-13T23:35:22.511Z",
+          "maxUsers": 10,
+          "maxStorageGB": 5
+        },
+        "settings": {
+          "baseCurrency": "USD",
+          "fiscalYearStart": 1,
+          "timezone": "America/El_Salvador",
+          "dateFormat": "DD/MM/YYYY",
+          "numberFormat": {
+            "decimalSeparator": ".",
+            "thousandsSeparator": ","
+          }
+        },
+        "status": "active",
+        "isActive": true,
+        "logo": null,
+        "onboarding": {
+          "isCompleted": false,
+          "completedSteps": []
+        },
+        "createdAt": "2025-09-13T23:35:22.512Z",
+        "updatedAt": "2025-09-13T23:35:22.850Z",
+        "__v": 0,
+        "createdBy": "68c5ffba27b9b61066d1eb72"
+      },
+      {
+        "_id": "68c5ffbb27b9b61066d1eb7a",
+        "name": "Holding Centroamericano S.A.",
+        "displayName": "Holding CA",
+        "email": "info@holding.com",
+        "address": {
+          "country": "El Salvador"
+        },
+        "industry": "Finanzas",
+        "subscription": {
+          "plan": "Enterprise",
+          "status": "active",
+          "startDate": "2025-09-13T23:35:23.165Z",
+          "endDate": "2026-09-13T23:35:23.165Z",
+          "maxUsers": 200,
+          "maxStorageGB": 200
+        },
+        "settings": {
+          "numberFormat": {
+            "decimalSeparator": ".",
+            "thousandsSeparator": ","
+          },
+          "baseCurrency": "USD",
+          "fiscalYearStart": 1,
+          "timezone": "America/El_Salvador",
+          "dateFormat": "DD/MM/YYYY"
+        },
+        "status": "active",
+        "isActive": true,
+        "logo": null,
+        "createdBy": "68c5ffba27b9b61066d1eb78",
+        "onboarding": {
+          "isCompleted": false,
+          "completedSteps": []
+        },
+        "createdAt": "2025-09-13T23:35:23.166Z",
+        "updatedAt": "2025-09-13T23:35:23.166Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffbb27b9b61066d1eb7e",
+        "name": "Constructora del Valle S.A.",
+        "displayName": "Constructora Valle",
+        "email": "proyectos@valle.com",
+        "address": {
+          "country": "El Salvador"
+        },
+        "industry": "Construcción",
+        "subscription": {
+          "plan": "Professional",
+          "status": "active",
+          "startDate": "2025-09-13T23:35:23.169Z",
+          "endDate": "2026-09-13T23:35:23.169Z",
+          "maxUsers": 50,
+          "maxStorageGB": 50
+        },
+        "settings": {
+          "numberFormat": {
+            "decimalSeparator": ".",
+            "thousandsSeparator": ","
+          },
+          "baseCurrency": "USD",
+          "fiscalYearStart": 1,
+          "timezone": "America/El_Salvador",
+          "dateFormat": "DD/MM/YYYY"
+        },
+        "status": "active",
+        "isActive": true,
+        "logo": null,
+        "createdBy": "68c5ffba27b9b61066d1eb78",
+        "onboarding": {
+          "isCompleted": false,
+          "completedSteps": []
+        },
+        "createdAt": "2025-09-13T23:35:23.169Z",
+        "updatedAt": "2025-09-13T23:35:23.169Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffbb27b9b61066d1eb82",
+        "name": "Restaurantes Premium S.A.",
+        "displayName": "Premium Restaurants",
+        "email": "admin@premium.com",
+        "address": {
+          "country": "El Salvador"
+        },
+        "industry": "Servicios",
+        "subscription": {
+          "plan": "Startup",
+          "status": "active",
+          "startDate": "2025-09-13T23:35:23.172Z",
+          "endDate": "2026-09-13T23:35:23.172Z",
+          "maxUsers": 10,
+          "maxStorageGB": 5
+        },
+        "settings": {
+          "numberFormat": {
+            "decimalSeparator": ".",
+            "thousandsSeparator": ","
+          },
+          "baseCurrency": "USD",
+          "fiscalYearStart": 1,
+          "timezone": "America/El_Salvador",
+          "dateFormat": "DD/MM/YYYY"
+        },
+        "status": "active",
+        "isActive": true,
+        "logo": null,
+        "createdBy": "68c5ffba27b9b61066d1eb78",
+        "onboarding": {
+          "isCompleted": false,
+          "completedSteps": []
+        },
+        "createdAt": "2025-09-13T23:35:23.172Z",
+        "updatedAt": "2025-09-13T23:35:23.172Z",
+        "__v": 0
+      }
+    ],
+    "userCompanies": [
+      {
+        "_id": "68c5ffb927b9b61066d1eb61",
+        "user": "68c5ffb927b9b61066d1eb5f",
+        "company": "68c5ffb927b9b61066d1eb5c",
+        "role": "owner",
+        "permissions": [
+          "view_finances",
+          "edit_finances",
+          "delete_finances",
+          "view_reports",
+          "generate_reports",
+          "export_reports",
+          "view_catalog",
+          "edit_catalog",
+          "manage_catalog",
+          "view_users",
+          "invite_users",
+          "manage_users",
+          "delete_users",
+          "view_company",
+          "edit_company",
+          "manage_company",
+          "view_settings",
+          "edit_settings"
+        ],
+        "status": "active",
+        "joinedAt": "2025-09-13T23:35:21.497Z",
+        "lastAccessAt": "2025-09-13T23:35:21.497Z",
+        "isActive": true,
+        "invitedAt": "2025-09-13T23:35:21.497Z",
+        "createdAt": "2025-09-13T23:35:21.497Z",
+        "updatedAt": "2025-09-13T23:35:21.497Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffb927b9b61066d1eb66",
+        "user": "68c5ffb927b9b61066d1eb64",
+        "company": "68c5ffb927b9b61066d1eb5c",
+        "role": "admin",
+        "permissions": [
+          "view_finances",
+          "edit_finances",
+          "view_reports",
+          "generate_reports",
+          "export_reports",
+          "view_catalog",
+          "edit_catalog",
+          "view_users",
+          "invite_users",
+          "manage_users",
+          "view_company",
+          "view_settings",
+          "edit_settings"
+        ],
+        "status": "active",
+        "joinedAt": "2025-09-13T23:35:21.867Z",
+        "lastAccessAt": "2025-09-13T23:35:21.867Z",
+        "isActive": true,
+        "invitedAt": "2025-09-13T23:35:21.867Z",
+        "createdAt": "2025-09-13T23:35:21.867Z",
+        "updatedAt": "2025-09-13T23:35:21.867Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffba27b9b61066d1eb6a",
+        "user": "68c5ffb927b9b61066d1eb68",
+        "company": "68c5ffb927b9b61066d1eb5c",
+        "role": "accountant",
+        "permissions": [
+          "view_finances",
+          "edit_finances",
+          "view_reports",
+          "generate_reports",
+          "view_catalog",
+          "edit_catalog"
+        ],
+        "status": "active",
+        "joinedAt": "2025-09-13T23:35:22.188Z",
+        "lastAccessAt": "2025-09-13T23:35:22.188Z",
+        "isActive": true,
+        "invitedAt": "2025-09-13T23:35:22.188Z",
+        "createdAt": "2025-09-13T23:35:22.189Z",
+        "updatedAt": "2025-09-13T23:35:22.189Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffba27b9b61066d1eb6e",
+        "user": "68c5ffba27b9b61066d1eb6c",
+        "company": "68c5ffb927b9b61066d1eb5c",
+        "role": "user",
+        "permissions": [
+          "view_finances",
+          "view_reports",
+          "view_catalog"
+        ],
+        "status": "active",
+        "joinedAt": "2025-09-13T23:35:22.509Z",
+        "lastAccessAt": "2025-09-13T23:35:22.509Z",
+        "isActive": true,
+        "invitedAt": "2025-09-13T23:35:22.509Z",
+        "createdAt": "2025-09-13T23:35:22.509Z",
+        "updatedAt": "2025-09-13T23:35:22.509Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffba27b9b61066d1eb74",
+        "user": "68c5ffba27b9b61066d1eb72",
+        "company": "68c5ffba27b9b61066d1eb70",
+        "role": "owner",
+        "permissions": [
+          "view_finances",
+          "edit_finances",
+          "delete_finances",
+          "view_reports",
+          "generate_reports",
+          "export_reports",
+          "view_catalog",
+          "edit_catalog",
+          "manage_catalog",
+          "view_users",
+          "invite_users",
+          "manage_users",
+          "delete_users",
+          "view_company",
+          "edit_company",
+          "manage_company",
+          "view_settings",
+          "edit_settings"
+        ],
+        "status": "active",
+        "joinedAt": "2025-09-13T23:35:22.848Z",
+        "lastAccessAt": "2025-09-13T23:35:22.848Z",
+        "isActive": true,
+        "invitedAt": "2025-09-13T23:35:22.848Z",
+        "createdAt": "2025-09-13T23:35:22.848Z",
+        "updatedAt": "2025-09-13T23:35:22.848Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffbb27b9b61066d1eb7c",
+        "user": "68c5ffba27b9b61066d1eb78",
+        "company": "68c5ffbb27b9b61066d1eb7a",
+        "role": "owner",
+        "permissions": [
+          "view_finances",
+          "edit_finances",
+          "delete_finances",
+          "view_reports",
+          "generate_reports",
+          "export_reports",
+          "view_catalog",
+          "edit_catalog",
+          "manage_catalog",
+          "view_users",
+          "invite_users",
+          "manage_users",
+          "delete_users",
+          "view_company",
+          "edit_company",
+          "manage_company",
+          "view_settings",
+          "edit_settings"
+        ],
+        "status": "active",
+        "joinedAt": "2025-09-13T23:35:23.167Z",
+        "lastAccessAt": "2025-09-14T00:21:09.402Z",
+        "isActive": true,
+        "invitedAt": "2025-09-13T23:35:23.167Z",
+        "createdAt": "2025-09-13T23:35:23.167Z",
+        "updatedAt": "2025-09-14T00:21:09.402Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffbb27b9b61066d1eb80",
+        "user": "68c5ffba27b9b61066d1eb78",
+        "company": "68c5ffbb27b9b61066d1eb7e",
+        "role": "owner",
+        "permissions": [
+          "view_finances",
+          "edit_finances",
+          "delete_finances",
+          "view_reports",
+          "generate_reports",
+          "export_reports",
+          "view_catalog",
+          "edit_catalog",
+          "manage_catalog",
+          "view_users",
+          "invite_users",
+          "manage_users",
+          "delete_users",
+          "view_company",
+          "edit_company",
+          "manage_company",
+          "view_settings",
+          "edit_settings"
+        ],
+        "status": "active",
+        "joinedAt": "2025-09-13T23:35:23.170Z",
+        "lastAccessAt": "2025-12-24T15:47:16.232Z",
+        "isActive": true,
+        "invitedAt": "2025-09-13T23:35:23.170Z",
+        "createdAt": "2025-09-13T23:35:23.171Z",
+        "updatedAt": "2025-12-24T15:47:16.236Z",
+        "__v": 0
+      },
+      {
+        "_id": "68c5ffbb27b9b61066d1eb84",
+        "user": "68c5ffba27b9b61066d1eb78",
+        "company": "68c5ffbb27b9b61066d1eb82",
+        "role": "owner",
+        "permissions": [
+          "view_finances",
+          "edit_finances",
+          "delete_finances",
+          "view_reports",
+          "generate_reports",
+          "export_reports",
+          "view_catalog",
+          "edit_catalog",
+          "manage_catalog",
+          "view_users",
+          "invite_users",
+          "manage_users",
+          "delete_users",
+          "view_company",
+          "edit_company",
+          "manage_company",
+          "view_settings",
+          "edit_settings"
+        ],
+        "status": "active",
+        "joinedAt": "2025-09-13T23:35:23.173Z",
+        "lastAccessAt": "2025-09-14T00:21:48.583Z",
+        "isActive": true,
+        "invitedAt": "2025-09-13T23:35:23.173Z",
+        "createdAt": "2025-09-13T23:35:23.174Z",
+        "updatedAt": "2025-09-14T00:21:48.583Z",
+        "__v": 0
+      }
+    ],
+    "accountCatalogs": []
+  },
+  "stats": {
+    "totalUsers": 7,
+    "totalCompanies": 5,
+    "totalUserCompanies": 8,
+    "totalAccountCatalogs": 0
+  }
+}

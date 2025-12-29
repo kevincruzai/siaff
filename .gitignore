@@ -1,8 +1,8 @@
 # Dependencies
 node_modules
 
-# Database backups (excluir backups locales sensibles)
-database/backups/*.json
+# Database backups (excluir backups locales sensibles, permitir el initial)
+database/backups/*-20*.json
 !database/backups/siaff-db-latest.json
 !database/backups/.gitkeep
 
