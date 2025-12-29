@@ -1,0 +1,5 @@
+# Ignorar archivos de backup con datos sensibles
+backups/*.json
+
+# Mantener el directorio
+!backups/.gitkeep

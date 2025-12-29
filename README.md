@@ -5,6 +5,25 @@ Está orientado a PYMEs, corporativos y organizaciones que buscan mejorar su ges
 
 ---
 
+## 🚀 INICIO RÁPIDO
+
+```batch
+# Windows - Ejecutar script de inicio
+start-dev.bat
+
+# O ver guía completa
+Ver: INICIO-RAPIDO.md
+```
+
+📚 **Documentación Completa:**
+- 🎯 [INICIO-RAPIDO.md](INICIO-RAPIDO.md) - Guía de inicio rápido
+- 📋 [CONFIGURACIONES.md](CONFIGURACIONES.md) - Todas las configuraciones implementadas
+- 📊 [RESUMEN-CONFIGURACIONES.md](RESUMEN-CONFIGURACIONES.md) - Resumen ejecutivo
+- 🔧 [README-TECH.md](README-TECH.md) - Documentación técnica
+- 🌐 [ngrok-setup.md](ngrok-setup.md) - Configuración para demos
+
+---
+
 ## CREDENCIALES
 🔑 **Sistema Multitenant - Credenciales de Prueba:**
 

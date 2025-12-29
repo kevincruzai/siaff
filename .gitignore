@@ -1,1 +1,15 @@
+# Dependencies
 node_modules
+
+# Database backups (excluir backups locales sensibles)
+database/backups/*.json
+!database/backups/siaff-db-latest.json
+!database/backups/.gitkeep
+
+# Environment
+.env
+.env.local
+
+# Build
+dist/
+*.log

@@ -8,10 +8,7 @@ export default defineConfig(({ mode }) => {
   
   return {
     plugins: [
-      react({
-        // Habilitar Fast Refresh
-        fastRefresh: true,
-      }),
+      react(),
     ],
     resolve: {
       alias: {
@@ -54,9 +51,6 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {
       include: ['react', 'react-dom', 'react-router-dom'],
-    },
-    define: {
-      __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
     },
   }
 })

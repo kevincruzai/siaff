@@ -20,7 +20,10 @@
     "format:check": "prettier --check \"src/**/*.js\"",
     "clean": "rimraf logs/*.log",
     "docker:build": "docker build -t siaff-backend .",
-    "docker:run": "docker run -p 5000:5000 --env-file .env siaff-backend"
+    "docker:run": "docker run -p 5000:5000 --env-file .env siaff-backend",
+    "db:export": "node ../database/export-database.cjs",
+    "db:import": "node ../database/import-database.cjs",
+    "db:backup": "npm run db:export"
   },
   "keywords": [
     "siaff",
@@ -44,8 +47,11 @@
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
+    "eslint": "^9.39.2",
+    "eslint-plugin-node": "^11.1.0",
     "jest": "^29.7.0",
     "nodemon": "^3.0.2",
+    "prettier": "^3.7.4",
     "supertest": "^6.3.3"
   },
   "engines": {
